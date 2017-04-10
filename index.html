@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>jsClock</title>
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Cabin">
+
+	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+	<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+	<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
+	<link rel="manifest" href="manifest.json">
+	<link rel="mask-icon" href="safari-pinned-tab.svg" color="#2288bb">
+	<meta name="theme-color" content="#ffffff">
+
+	<style>
+
+		body {
+			background-color: #111;
+			color: #fff;
+			font-family: 'Cabin',
+				-apple-system, system-ui, BlinkMacSystemFont,
+				"Segoe UI", Roboto, "Helvetica Neue", Arial,
+				sans-serif;
+			/* text-shadow:  1px 1px 3px #666, -1px -1px 3px #fff, 1px 1px #666, -1px -1px #fff; */
+		}
+
+		#clock {
+			display: table-row;
+			margin: 0px auto;
+		}
+
+		#time,
+		#data {
+			display: table-cell;
+		}
+
+		#time {
+			color: #fc4;
+
+		}
+
+		#ampm { color: #988; }
+
+		#calendar { color: #28B; }
+
+		.fnt-l,
+		.fnt-m {
+			font-weight: bold;
+		}
+
+		#ampm {
+			font-weight: normal;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<div id="frame" class="col-12">
+				<div id="face">
+					<span id="clock"><span id="time" class="fnt-l"><span
+						id="hour">12</span><span
+						id="dots1">:</span><span
+						id="minutes">00</span></span><span id="data" class="fnt-m"><span
+						id="dots2">:</span><span
+						id="seconds">00</span><span
+						id="ampm">am</span></span></span>
+					<br>
+					<span id="calendar" class="fnt-s"><span
+						id="dow">Monday</span>, <span
+						id="day">1</span> <span
+						id="month">January</span> <span
+						id="year">2020</span></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script src="//code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+	<script>
+		months = new Array(
+			'January',
+			'February',
+			'March',
+			'April',
+			'May',
+			'June',
+			'Jully',
+			'August',
+			'September',
+			'October',
+			'November',
+			'December' );
+		days = new Array(
+			'Sunday',
+			'Monday',
+			'Tuesday',
+			'Wednesday',
+			'Thursday',
+			'Friday',
+			'Saturday' );
+
+		function doResize() {
+			var f_w = $("#frame").width();
+			// alert(f_w);
+			var fnt_l = Math.round(f_w / 3.5);
+			var fnt_m = Math.round(fnt_l / 2);
+			var fnt_s = Math.round(fnt_l / 4);
+
+			$(".fnt-l").css("font-size", fnt_l+"px");
+			$(".fnt-l").css("line-height", fnt_l+"px");
+			$(".fnt-m").css("font-size", fnt_m+"px");
+			$(".fnt-m").css("line-height", fnt_m+"px");
+			$(".fnt-s").css("font-size", fnt_s+"px");
+			$(".fnt-s").css("line-height", fnt_s+"px");
+
+			$("#data").css("position", "relative");
+			$("#seconds").css("position", "absolute");
+			$("#seconds").css("top", Math.round(fnt_l / 10)+"px");
+			$("#ampm").css("position", "absolute");
+			$("#ampm").css("top", fnt_m+"px");
+			$("#dots2").css("display", "none");
+
+			var fh = Math.round(($(window).height() - $("#face").outerHeight()) / 2);
+			if (fh < 0) fh = 0;
+			$("#face").css("position", "absolute");
+			$("#face").css("top", fh);
+		}
+
+		function showTime() {
+			var today = new Date();
+
+			// Time
+			var a_h = today.getHours();
+			var a_m = today.getMinutes();
+			var a_s = today.getSeconds();
+
+			var d_t = ( a_h < 12 ) ? "am" : "pm";
+			var d_h = ( a_h > 12 ) ? a_h - 12 : a_h;
+			d_h = ( d_h == 0 ) ? 12 : d_h;
+
+			var d_m = ( a_m < 10 ? "0" : "" ) + a_m;
+			var d_s = ( a_s < 10 ? "0" : "" ) + a_s;
+
+			if ($("#hour").html().localeCompare(d_h) !== 0) $("#hour").html(d_h);
+			if ($("#minutes").html().localeCompare(d_m) !== 0) $("#minutes").html(d_m);
+			if ($("#seconds").html().localeCompare(d_s) !== 0) $("#seconds").html(d_s);
+			if ($("#ampm").html().localeCompare(d_t) !== 0) $("#ampm").html(d_t);
+
+			// Title
+			var ttl = (a_h < 10 ? "0" : "") + a_h + ":" + d_m;
+			if (document.title.localeCompare(d_t) !== 0) document.title = ttl;
+
+			// Date
+			var d_y = today.getFullYear();
+			var a_n = today.getMonth();
+			var d_d = today.getDate();
+			var a_w = today.getDay();
+
+			var d_n = months[a_n];
+			var d_w = days[a_w];
+
+			if ($("#dow").html().localeCompare(d_w) !== 0) $("#dow").html(d_w);
+			if ($("#day").html().localeCompare(d_d) !== 0) $("#day").html(d_d);
+			if ($("#month").html().localeCompare(d_n) !== 0) $("#month").html(d_n);
+			if ($("#year").html().localeCompare(d_y) !== 0) $("#year").html(d_y);
+
+			// come back
+			var t = setTimeout(showTime, 1000);
+		}
+
+		$(document).ready(function() {
+			doResize();
+			showTime();
+		});
+
+		$(window).resize(function() {
+			doResize();
+		})
+	</script>
+</body>
+</html>
