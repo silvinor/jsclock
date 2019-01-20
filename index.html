@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
+	<meta http-equiv="refresh" content="14400"><!-- refresh every 4 hours -->
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<title>jsClock</title>
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Cabin">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i">
 
 	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 	<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
@@ -15,14 +16,21 @@
 	<meta name="theme-color" content="#ffffff">
 
 	<style>
+		html, body {
+			height: 100% !important;
+		}
 
 		body {
-			background-color: #111;
-			color: #fff;
-			font-family: 'Cabin',
+			background-color: #181818;
+			color: #fcfcfe;
+			margin: 0;
+			font-family: 'Open Sans',
 				-apple-system, BlinkMacSystemFont,
 				"Segoe UI", Roboto, "Helvetica Neue", Arial,
-				sans-serif;
+				"Noto Sans", sans-serif;
+			font-size: 1rem;
+			font-weight: 400;
+			line-height: 1.5;
 			cursor: none;
 		}
 
@@ -37,16 +45,20 @@
 		}
 
 		#time {
-			color: #fc4;
-
+			color: #fbcb40;
 		}
 
-		#ampm { color: #988; }
+		#ampm {
+			color: #908686;
+			opacity: 0.8;
+			font-size: 80%;
+		}
 
-		#calendar { color: #39c; }
+		#calendar { color: #4682b4; }
 
 		.fnt-l,
 		.fnt-m {
+			text-size-adjust: 100%;
 			font-weight: bold;
 		}
 
@@ -68,7 +80,7 @@
 						id="seconds">00</span><span
 						id="ampm">am</span></span></span>
 					<br>
-					<span id="calendar" class="fnt-s"><span
+					<span id="calendar" class="fnt-s">&nbsp;<span
 						id="dow">Monday</span>, <span
 						id="day">1</span> <span
 						id="month">January</span> <span
@@ -78,10 +90,9 @@
 		</div>
 	</div>
 
-
-	<script src="//code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-	<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<!-- script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script -->
+	<!-- script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script -->
 	<script>
 		months = new Array(
 			'January',
