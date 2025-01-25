@@ -1,198 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>jsClock</title>
 	<meta http-equiv="refresh" content="14400"><!-- refresh every 4 hours -->
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>jsClock</title>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-	<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i">
 
-	<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-	<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
-	<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
-	<link rel="manifest" href="manifest.json">
-	<link rel="mask-icon" href="safari-pinned-tab.svg" color="#3399cc">
-	<meta name="theme-color" content="#ffffff">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+	<!-- <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet"> -->
 
-	<style>
-		html, body {
-			height: 100% !important;
-		}
-
-		body {
-			background-color: #181818;
-			color: #fcfcfe;
-			margin: 0;
-			font-family: 'Open Sans',
-				-apple-system, BlinkMacSystemFont,
-				"Segoe UI", Roboto, "Helvetica Neue", Arial,
-				"Noto Sans", sans-serif;
-			font-size: 1rem;
-			font-weight: 400;
-			line-height: 1.5;
-			cursor: none;
-		}
-
-		#clock {
-			display: table-row;
-			margin: 0px auto;
-		}
-
-		#time,
-		#data {
-			display: table-cell;
-		}
-
-		#time {
-			color: #fbcb40;
-		}
-
-		#ampm {
-			color: #908686;
-			opacity: 0.8;
-			font-size: 80%;
-		}
-
-		#calendar { color: #4682b4; }
-
-		.fnt-l,
-		.fnt-m {
-			text-size-adjust: 100%;
-			font-weight: bold;
-		}
-
-		#ampm {
-			font-weight: normal;
-		}
-	</style>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column; /* Stack elements vertically */
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #181818;
+      color: #eee;
+      font-family: "Raleway", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif; /* */
+      /* font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif; /* */
+			cursor: none; /* */
+    }
+    #clock {
+      width: 55%;
+      height: auto;
+    }
+    #pomodoro #p1,
+    #pomodoro #p2,
+    #pomodoro #p3,
+    #pomodoro #p4 {
+      opacity: 0.667;
+    }
+    #pomodoro #p5 {
+      opacity: 0.333;
+    }
+    /* svg {
+      filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 1));
+    } */
+  </style>
 </head>
+<!-- Color Palette by Kate Morley > https://iamkate.com/data/12-bit-rainbow/ -->
 <body>
-	<div class="container">
-		<div class="row">
-			<div id="frame" class="col-12">
-				<div id="face">
-					<span id="clock"><span id="time" class="fnt-l"><span
-						id="hour">12</span><span
-						id="dots1">:</span><span
-						id="minutes">00</span></span><span id="data" class="fnt-m"><span
-						id="dots2">:</span><span
-						id="seconds">00</span><span
-						id="ampm">am</span></span></span>
-					<br>
-					<span id="calendar" class="fnt-s">&nbsp;<span
-						id="dow">Monday</span>, <span
-						id="day">1</span> <span
-						id="month">January</span> <span
-						id="year">2020</span></span>
-				</div>
-			</div>
-		</div>
-	</div>
+  <svg id="clock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120">
+    <g font-family="inherit">
+      <text id="time-str" x="225" y="40" text-anchor="end" dominant-baseline="middle" font-size="80" fill="#ed0" font-weight="700">00:00</text>
+      <text id="secs-str" x="230" y="25" text-anchor="begin" dominant-baseline="middle" font-size="50" fill="#eee" font-weight="700">00</text>
+      <text id="hr12-str" x="230" y="60" text-anchor="begin" dominant-baseline="middle" font-size="35" fill="#858585" font-weight="400">am</text>
+      <text id="date-str" x="0" y="106.5" font-size="40" fill="#09c" font-weight="400" textLength="300" lengthAdjust="spacingAndGlyphs">If you see this, it's broken!</text>
+    </g>
+    <g id="pomodoro" stroke="none">
+      <rect id="p5" x="200" y="118" width="100" height="2" fill="#4e4e4e" />
+      <rect id="p4" x="150" y="118" width="50" height="2" fill="#e94" />
+      <rect id="p3" x="100" y="118" width="50" height="2" fill="#a35" />
+      <rect id="p2" x="50" y="118" width="50" height="2" fill="#36b" />
+      <rect id="p1" x="0" y="118" width="50" height="2" fill="#4d8" />
+    </g>
+  </svg>
+  <script>
+    const months = new Array(
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December' );
+    const days = new Array(
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday' );
+    var isVisible = true;
+    const oldTitle = document.title;
 
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	<!-- script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script -->
-	<!-- script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script -->
-	<script>
-		months = new Array(
-			'January',
-			'February',
-			'March',
-			'April',
-			'May',
-			'June',
-			'Jully',
-			'August',
-			'September',
-			'October',
-			'November',
-			'December' );
-		days = new Array(
-			'Sunday',
-			'Monday',
-			'Tuesday',
-			'Wednesday',
-			'Thursday',
-			'Friday',
-			'Saturday' );
+    function setContentById(elementId, newValue) {
+      const element = document.getElementById(elementId);
+      if (element && newValue !== element.textContent) {
+        element.textContent = newValue;
+      }
+    }
 
-		function doResize() {
-			var f_w = $("#frame").width();
-			// alert(f_w);
-			var fnt_l = Math.round(f_w / 3.5);
-			var fnt_m = Math.round(fnt_l / 2);
-			var fnt_s = Math.round(fnt_l / 4);
+    function updateClock(now) {
+      var hours = now.getHours();
+      const tHourStr = (hours >= 12) ? "pm" : "am";
+      if (hours > 12) hours -= 12;
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
 
-			$(".fnt-l").css("font-size", fnt_l+"px");
-			$(".fnt-l").css("line-height", fnt_l+"px");
-			$(".fnt-m").css("font-size", fnt_m+"px");
-			$(".fnt-m").css("line-height", fnt_m+"px");
-			$(".fnt-s").css("font-size", fnt_s+"px");
-			$(".fnt-s").css("line-height", fnt_s+"px");
+      const timeStr = String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0');
+      const secsStr = String(seconds).padStart(2, '0');
 
-			$("#data").css("position", "relative");
-			$("#seconds").css("position", "absolute");
-			$("#seconds").css("top", Math.round(fnt_l / 10)+"px");
-			$("#ampm").css("position", "absolute");
-			$("#ampm").css("top", fnt_m+"px");
-			$("#dots2").css("display", "none");
+      setContentById("time-str", timeStr);
+      setContentById("secs-str", secsStr);
+      setContentById("hr-str", tHourStr);
 
-			var fh = Math.round(($(window).height() - $("#face").outerHeight()) / 2);
-			if (fh < 0) fh = 0;
-			$("#face").css("position", "absolute");
-			$("#face").css("top", fh);
-		}
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const day = now.getDate();
+      const weekday = now.getDay();
 
-		function showTime() {
-			var today = new Date();
+      const fullDateStr = days[weekday] + ", " + day + " " + months[month] + " " + year;
+      setContentById("date-str", fullDateStr);
+    }
 
-			// Time
-			var a_h = today.getHours();
-			var a_m = today.getMinutes();
-			var a_s = today.getSeconds();
+    function setVisibilityByEl(element, visible) {
+      if (element) {
+        let value = visible ? "visible" : "hidden";
+        if (value !== element.getAttribute("visibility")) {
+          element.setAttribute("visibility", value);
+        }
+      }
+    }
 
-			var d_t = ( a_h < 12 ) ? "am" : "pm";
-			var d_h = ( a_h > 12 ) ? a_h - 12 : a_h;
-			d_h = ( d_h == 0 ) ? 12 : d_h;
+    function setXAndWidthByEl(element, x, width) {
+      if (element) {
+        let newX = x.toFixed(3);
+        let newWidth = width.toFixed(3);
 
-			var d_m = ( a_m < 10 ? "0" : "" ) + a_m;
-			var d_s = ( a_s < 10 ? "0" : "" ) + a_s;
+        setVisibilityByEl(element, true);  // assume you want to see it
+        if (element.getAttribute("x") !== newX) {
+          element.setAttribute("x", newX);
+        }
+        if (element.getAttribute("width") !== newWidth) {
+          element.setAttribute("width", newWidth);
+        }
+      }
+    }
 
-			if ($("#hour").html().localeCompare(d_h) !== 0) $("#hour").html(d_h);
-			if ($("#minutes").html().localeCompare(d_m) !== 0) $("#minutes").html(d_m);
-			if ($("#seconds").html().localeCompare(d_s) !== 0) $("#seconds").html(d_s);
-			if ($("#ampm").html().localeCompare(d_t) !== 0) $("#ampm").html(d_t);
+    function updatePomodoro(now) {
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
 
-			// Title
-			var ttl = (a_h < 10 ? "0" : "") + a_h + ":" + d_m;
-			if (document.title.localeCompare(d_t) !== 0) document.title = ttl;
+      const maxVal = 30 * 60;
+      const divCut = 25 / 30;  // 25 min ON, 5 min REST
+      const svgWidth = 300;
 
-			// Date
-			var d_y = today.getFullYear();
-			var a_n = today.getMonth();
-			var d_d = today.getDate();
-			var a_w = today.getDay();
+      var progress = (minutes * 60) + seconds;
+      while (progress > maxVal) progress -= maxVal;
+      const percentage = progress / maxVal;
 
-			var d_n = months[a_n];
-			var d_w = days[a_w];
+      let p1 = document.getElementById("p1");
+      let p2 = document.getElementById("p2");
+      let p3 = document.getElementById("p3");
+      let p4 = document.getElementById("p4");
+      let p5 = document.getElementById("p5");
+      if (percentage <= divCut) {
+        let cut = percentage;
+        setXAndWidthByEl(p1, 0, cut * svgWidth);
+        setXAndWidthByEl(p2, cut * svgWidth, (divCut - cut) * svgWidth);
+        setVisibilityByEl(p3, false);
+        setVisibilityByEl(p4, false);
+        setXAndWidthByEl(p5, divCut * svgWidth, (1 - divCut) * svgWidth);
+      } else {
+        let cut = percentage - divCut;
+        setVisibilityByEl(p1, false);
+        setVisibilityByEl(p2, false);
+        setXAndWidthByEl(p3, divCut * svgWidth, cut * svgWidth);
+        setXAndWidthByEl(p4, (divCut + cut) * svgWidth, (1 - divCut + cut) * svgWidth);
+        setXAndWidthByEl(p5, 0, divCut * svgWidth);
+      }
+    }
 
-			if ($("#dow").html().localeCompare(d_w) !== 0) $("#dow").html(d_w);
-			if ($("#day").html().localeCompare(d_d) !== 0) $("#day").html(d_d);
-			if ($("#month").html().localeCompare(d_n) !== 0) $("#month").html(d_n);
-			if ($("#year").html().localeCompare(d_y) !== 0) $("#year").html(d_y);
+    function updateTitle(now) {
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+			const title = String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0');
+      if (title !== document.title) {
+        document.title = title;
+      }
+    }
 
-			// come back
-			var t = setTimeout(showTime, 1000);
-		}
+    function updateAll() {
+      if (isVisible) {
+        const now = new Date();
+        updateTitle(now);
+        updateClock(now);
+        updatePomodoro(now);
+      } else {
+        if (oldTitle !== document.title) {
+          document.title = oldTitle;
+        }
+      }
+    }
 
-		$(document).ready(function() {
-			doResize();
-			showTime();
-		});
+    // function doResize() {
+    // }
 
-		$(window).resize(function() {
-			doResize();
-		})
-	</script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // doResize();
+      updateAll(); // Initialize clock immediately
+      setInterval(updateAll, 1000);
+    });
+
+    // window.addEventListener('resize', function() {
+    // 	doResize();
+    // })
+
+    document.addEventListener("visibilitychange", function() {
+      if (document.visibilityState === "hidden") { 
+        isVisible = false;
+      } else if (document.visibilityState === "visible") {
+        isVisible = true;
+      } else {
+        isVisible = true;  // what's your fallback choice?
+      }
+      updateAll();
+    });
+  </script>
 </body>
 </html>
