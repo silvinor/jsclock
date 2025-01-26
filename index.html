@@ -56,7 +56,7 @@ Made by:
       <text id="time-str" x="225" y="40" text-anchor="end" dominant-baseline="middle" font-size="80" fill="#ed0" font-weight="700">00:00</text>
       <text id="secs-str" x="230" y="25" text-anchor="begin" dominant-baseline="middle" font-size="50" fill="#eee" font-weight="700">00</text>
       <text id="hr12-str" x="230" y="60" text-anchor="begin" dominant-baseline="middle" font-size="35" fill="#858585" font-weight="400">am</text>
-      <text id="date-str" x="0" y="106.5" font-size="40" fill="#09c" font-weight="400" textLength="300" lengthAdjust="spacingAndGlyphs">If you see this, it's broken!</text>
+      <text id="date-str" x="0" y="105" font-size="32" fill="#09c" font-weight="400" textLength="300" lengthAdjust="spacingAndGlyphs">If you see this, it's broken!</text>
     </g>
     <g id="pomodoro" stroke="none">
       <rect id="p5" x="200" y="118" width="100" height="2" fill="#4e4e4e" />
@@ -112,7 +112,7 @@ Made by:
 
       setContentById("time-str", timeStr);
       setContentById("secs-str", secsStr);
-      setContentById("hr-str", tHourStr);
+      setContentById("hr12-str", tHourStr);
 
       const year = now.getFullYear();
       const month = now.getMonth();
