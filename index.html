@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!--
+Made by:
+   ____  _ _       _                  ____           _      _
+  / ___|(_) |_   _(_)_ __   ___      |  _ \ ___   __| |_ __(_) __ _ _   _  ___  ___
+  \___ \| | \ \ / / | '_ \ / _ \     | |_) / _ \ / _` | '__| |/ _` | | | |/ _ \/ __|
+   ___) | | |\ V /| | | | | (_) |    |  _ < (_) | (_| | |  | | (_| | |_| |  __/\__ \
+  |____/|_|_| \_/ |_|_| |_|\___/     |_| \_\___/ \__,_|_|  |_|\__, |\__,_|\___||___/
+                                                              |___/
+@see: https://github.com/silvinor/jsclock
+-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -9,7 +19,6 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
-	<!-- <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet"> -->
 
   <style>
     body {
@@ -22,7 +31,6 @@
       background-color: #181818;
       color: #eee;
       font-family: "Raleway", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif; /* */
-      /* font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif; /* */
 			cursor: none; /* */
     }
     #clock {
@@ -39,9 +47,6 @@
     #pomodoro #p5 {
       opacity: 0.333;
     }
-    /* svg {
-      filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 1));
-    } */
   </style>
 </head>
 <!-- Color Palette by Kate Morley > https://iamkate.com/data/12-bit-rainbow/ -->
@@ -209,20 +214,21 @@
 
       if (wakeLockSupported) {
         if (isVisible) {
-          document.body.style.cursor = "none"; // Hide the cursor
-          try {
-            wakeLock = await navigator.wakeLock.request("screen");
-            // console.info("Wake Lock is active");
+          if (wakeLock === null) {
+            try {
+              wakeLock = await navigator.wakeLock.request("screen");
+              // console.info("Wake Lock is active");
 
-            wakeLock.addEventListener("release", () => {
-              // console.info("Wake Lock has been released");
-              wakeLock = null;
-            });
-          } catch (err) {
-            console.error( `Wake Lock Error: ${err.name}, ${err.message}` );
+              wakeLock.addEventListener("release", () => {
+                // console.info("Wake Lock has been released");
+                wakeLock = null;
+              });
+            } catch (err) {
+              console.error( `Wake Lock Error: ${err.name}, ${err.message}` );
+            }
           }
         } else {
-          document.body.style.cursor = "default"; // Show the cursor
+          // !isVisible
           if (wakeLock !== null) {
             wakeLock.release().then(() => {
               wakeLock = null;
@@ -237,6 +243,7 @@
     document.addEventListener("visibilitychange", visibilityChange);
 
     // async function doResize() {
+    //   // not needed now with SVG
     // }
 
     window.addEventListener('resize', function() {
