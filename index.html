@@ -28,6 +28,7 @@
     #clock {
       width: 55%;
       height: auto;
+      pointer-events: none;
     }
     #pomodoro #p1,
     #pomodoro #p2,
@@ -84,6 +85,8 @@
       'Saturday' );
     var isVisible = true;
     const oldTitle = document.title;
+    var wakeLockSupported = false;
+    let wakeLock = null;
 
     function setContentById(elementId, newValue) {
       const element = document.getElementById(elementId);
@@ -182,7 +185,7 @@
       }
     }
 
-    function updateAll() {
+    async function updateAll() {
       if (isVisible) {
         const now = new Date();
         updateTitle(now);
@@ -195,20 +198,7 @@
       }
     }
 
-    // function doResize() {
-    // }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      // doResize();
-      updateAll(); // Initialize clock immediately
-      setInterval(updateAll, 1000);
-    });
-
-    // window.addEventListener('resize', function() {
-    // 	doResize();
-    // })
-
-    document.addEventListener("visibilitychange", function() {
+    async function visibilityChange() {
       if (document.visibilityState === "hidden") { 
         isVisible = false;
       } else if (document.visibilityState === "visible") {
@@ -216,7 +206,60 @@
       } else {
         isVisible = true;  // what's your fallback choice?
       }
+
+      if (wakeLockSupported) {
+        if (isVisible) {
+          document.body.style.cursor = "none"; // Hide the cursor
+          try {
+            wakeLock = await navigator.wakeLock.request("screen");
+            // console.info("Wake Lock is active");
+
+            wakeLock.addEventListener("release", () => {
+              // console.info("Wake Lock has been released");
+              wakeLock = null;
+            });
+          } catch (err) {
+            console.error( `Wake Lock Error: ${err.name}, ${err.message}` );
+          }
+        } else {
+          document.body.style.cursor = "default"; // Show the cursor
+          if (wakeLock !== null) {
+            wakeLock.release().then(() => {
+              wakeLock = null;
+            });
+          }
+        }
+      }
+
       updateAll();
+    }
+
+    document.addEventListener("visibilitychange", visibilityChange);
+
+    // async function doResize() {
+    // }
+
+    window.addEventListener('resize', function() {
+      // doResize();
+      visibilityChange();
+    });
+
+    /**
+     * Run on first load
+     */
+    document.addEventListener("DOMContentLoaded", function() {
+      // doResize();
+      updateAll(); // Initialize clock immediately, first time run
+
+      if ("wakeLock" in navigator) {
+        wakeLockSupported = true;
+        // console.info("Screen Wake Lock API is supported");
+        visibilityChange(); // first time run
+      } else {
+        console.warn("Screen Wake Lock API is not supported on this browser");
+      }
+
+      setInterval(updateAll, 1000); // Start the update loop
     });
   </script>
 </body>
