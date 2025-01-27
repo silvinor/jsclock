@@ -57,15 +57,21 @@
       width: 100%;
       text-align: center;
       padding: 10px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
       color: #ddd;
-      opacity: 0; /* Initially hidden */
-      visibility: hidden; /* Prevents interaction when invisible */
-      transition: opacity 2s ease-in-out, visibility 2s ease-in-out; /* Fading effect */
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 2s ease-in-out, visibility 2s ease-in-out;
     }
     #copyright.visible {
       opacity: 1;
       visibility: visible;
+    }
+
+    body, #clock, #copyright {
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
     }
   </style>
   <!-- Color Palette by Kate Morley > https://iamkate.com/data/12-bit-rainbow/ -->
@@ -310,6 +316,25 @@
       }
     }
 
+    function handleDoubleClick() {
+      if (!document.fullscreenElement) {
+        let element = document.documentElement;
+        if (element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if (element.webkitRequestFullscreen) {
+          element.webkitRequestFullscreen();
+        } else {
+          console.error("Fullscreen API not supported");
+        }      
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      }
+    }
+
     /**
      * Run on first load
      */
@@ -327,6 +352,7 @@
       document.addEventListener("visibilitychange", visibilityChange);
       window.addEventListener("resize", visibilityChange);
       document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("dblclick", handleDoubleClick);
 
       setInterval(updateAll, 1000); // Start the update loop
     });
