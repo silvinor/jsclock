@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<!--
-Made by:
-   ____  _ _       _                  ____           _      _
-  / ___|(_) |_   _(_)_ __   ___      |  _ \ ___   __| |_ __(_) __ _ _   _  ___  ___
-  \___ \| | \ \ / / | '_ \ / _ \     | |_) / _ \ / _` | '__| |/ _` | | | |/ _ \/ __|
-   ___) | | |\ V /| | | | | (_) |    |  _ < (_) | (_| | |  | | (_| | |_| |  __/\__ \
-  |____/|_|_| \_/ |_|_| |_|\___/     |_| \_\___/ \__,_|_|  |_|\__, |\__,_|\___||___/
-                                                              |___/
-@see: https://github.com/silvinor/jsclock
--->
 <html lang="en">
 <head>
+  <!--
+  Made by:
+    ____  _ _       _                  ____           _      _
+    / ___|(_) |_   _(_)_ __   ___      |  _ \ ___   __| |_ __(_) __ _ _   _  ___  ___
+    \___ \| | \ \ / / | '_ \ / _ \     | |_) / _ \ / _` | '__| |/ _` | | | |/ _ \/ __|
+    ___) | | |\ V /| | | | | (_) |    |  _ < (_) | (_| | |  | | (_| | |_| |  __/\__ \
+    |____/|_|_| \_/ |_|_| |_|\___/     |_| \_\___/ \__,_|_|  |_|\__, |\__,_|\___||___/
+                                                                |___/
+  @see: https://github.com/silvinor/jsclock for source
+  @license: MIT
+  -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
   <title>jsClock</title>
@@ -33,11 +34,13 @@ Made by:
       font-family: "Raleway", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif; /* */
 			cursor: none; /* */
     }
+
     #clock {
-      width: 55%;
+      width: 50%;
       height: auto;
       pointer-events: none;
     }
+
     #pomodoro #p1,
     #pomodoro #p2,
     #pomodoro #p3,
@@ -47,9 +50,26 @@ Made by:
     #pomodoro #p5 {
       opacity: 0.333;
     }
+
+    #copyright {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ddd;
+      opacity: 0; /* Initially hidden */
+      visibility: hidden; /* Prevents interaction when invisible */
+      transition: opacity 2s ease-in-out, visibility 2s ease-in-out; /* Fading effect */
+    }
+    #copyright.visible {
+      opacity: 1;
+      visibility: visible;
+    }
   </style>
+  <!-- Color Palette by Kate Morley > https://iamkate.com/data/12-bit-rainbow/ -->
 </head>
-<!-- Color Palette by Kate Morley > https://iamkate.com/data/12-bit-rainbow/ -->
 <body>
   <svg id="clock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120">
     <!-- <rect x="0" y="y" width="300" height="120" fill="none" stroke="red" stroke-width="1" stroke-dasharray="1" /> -->
@@ -67,6 +87,8 @@ Made by:
       <rect id="p1" x="0" y="118" width="50" height="2" fill="#4d8" />
     </g>
   </svg>
+  <div id="copyright">&copy; 2017-2025 Silvino Rodrigues</div>
+
   <script>
     const months = new Array(
       'January',
@@ -89,10 +111,17 @@ Made by:
       'Thursday',
       'Friday',
       'Saturday' );
+
     var isVisible = true;
     const oldTitle = document.title;
     var wakeLockSupported = false;
     let wakeLock = null;
+
+    var lastMousePosition = { x: null, y: null };
+    var debounceTimeout = null;
+    var isMouseMoving = false;
+    var copyrightTimeout = null;
+    var isCopyrightVisible = false;
 
     function setContentById(elementId, newValue) {
       const element = document.getElementById(elementId);
@@ -241,22 +270,50 @@ Made by:
       updateAll();
     }
 
-    document.addEventListener("visibilitychange", visibilityChange);
+    function handleCopyrightVisibility() {
+      const copyrightElement = document.getElementById('copyright');
+      if (isCopyrightVisible) {
+        copyrightElement.classList.remove('visible');
+        isCopyrightVisible = false;
+      } else if (isMouseMoving) {
+        copyrightElement.classList.add('visible');
+        isCopyrightVisible = true;
+      }
+      clearTimeout(copyrightTimeout);
+      copyrightTimeout = null; // must reset to pass `=== null` test
+    }
 
-    // async function doResize() {
-    //   // not needed now with SVG
-    // }
+    function handleDebounce() {
+      clearTimeout(debounceTimeout);
+      isMouseMoving = false;
+      if (isCopyrightVisible && copyrightTimeout === null) {
+        copyrightTimeout = setTimeout(handleCopyrightVisibility, 5000);  
+      }
+    }
 
-    window.addEventListener('resize', function() {
-      // doResize();
-      visibilityChange();
-    });
+    function handleMouseMove(event) {
+      let eventX = event.clientX;
+      let eventY = event.clientY;
+      if (
+        lastMousePosition.x === null ||
+        lastMousePosition.y === null ||
+        (lastMousePosition.x !== eventX || lastMousePosition.y !== eventY)
+      ) {
+        isMouseMoving = true;
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(handleDebounce, 200);
+        lastMousePosition.x = eventX;
+        lastMousePosition.y = eventY;
+        if (!isCopyrightVisible && copyrightTimeout === null) {
+          copyrightTimeout = setTimeout(handleCopyrightVisibility, 1000);  
+        }
+      }
+    }
 
     /**
      * Run on first load
      */
     document.addEventListener("DOMContentLoaded", function() {
-      // doResize();
       updateAll(); // Initialize clock immediately, first time run
 
       if ("wakeLock" in navigator) {
@@ -266,6 +323,10 @@ Made by:
       } else {
         console.warn("Screen Wake Lock API is not supported on this browser");
       }
+
+      document.addEventListener("visibilitychange", visibilityChange);
+      window.addEventListener("resize", visibilityChange);
+      document.addEventListener("mousemove", handleMouseMove);
 
       setInterval(updateAll, 1000); // Start the update loop
     });
