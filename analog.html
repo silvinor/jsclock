@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!--
+ * jsClock - A simple analog clock with pomodoro timer
+ * Copyright (c) 2025 Silvino Rodrigues
+ * @license MIT
+ * @see https://github.com/silvinor/jsclock
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>jsClock</title>
+	<meta http-equiv="refresh" content="21600"><!-- refresh every 6 hours -->
+
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="manifest" href="site.webmanifest">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="jsclock.css">
+  <link rel="stylesheet" href="analog.css">
+</head>
+<body id="analog">
+  <svg id="clock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+    <defs>
+      <linearGradient id="g1" x1="100%" y1="0%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#bbb"/>
+        <stop offset="100%" stop-color="#eee"/>
+      </linearGradient>
+      <radialGradient id="g2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+        <stop offset="0%" stop-color="#eee"/>
+        <stop offset="100%" stop-color="#bbb"/>
+      </radialGradient>
+      <linearGradient id="g3" x1="100%" y1="0%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#ddd"/>
+        <stop offset="100%" stop-color="#ccc"/>
+      </linearGradient>
+    </defs>
+    <g id="clock-face">
+      <circle cx="100" cy="100" r="100" stroke="black" stroke-width="2" fill="url(#g1)" />
+      <circle cx="100" cy="100" r="80" stroke="none" fill="url(#g2)" />
+      <text id="clock-name" x="100" y="60" text-anchor="middle" dominant-baseline="middle"></text>
+    </g>
+    <g id="pomodoro" fill="none" stroke-width="2.5" stroke-linecap="butt">
+      <path d="" id="p5" visibility="hidden" stroke="#4e4e4e" />
+      <path d="" id="p4" visibility="hidden" stroke="#e94" />
+      <path d="" id="p3" visibility="hidden" stroke="#a35" />
+      <path d="" id="p2" visibility="hidden" stroke="#36b" />
+      <path d="" id="p1" visibility="hidden" stroke="#4d8" />
+    </g>    
+    <g id="markers" stroke-linecap="round"></g>
+    <g id="date" stroke="#979797" stroke-width="0.2">
+      <rect x="120" y="94" width="20" height="12" rx="2" ry="2" fill="url(#g3)" />
+      <rect x="140" y="94" width="15" height="12" rx="2" ry="2" fill="url(#g3)" />
+      <rect x="155" y="94" width="20" height="12" rx="2" ry="2" fill="url(#g3)" />
+      <text id="dow-str"   x="130" y="101" textLength="16" text-anchor="middle" dominant-baseline="middle" lengthAdjust="spacingAndGlyphs"></text>
+      <text id="day-str"   x="147.5" y="101" textLength="11" text-anchor="middle" dominant-baseline="middle" lengthAdjust="spacingAndGlyphs"></text>
+      <text id="month-str" x="165" y="101" textLength="16" text-anchor="middle" dominant-baseline="middle" lengthAdjust="spacingAndGlyphs"></text>
+    </g>
+    <g id="hands" stroke-linecap="round" stroke="#000">
+      <line id="hour-hand"     x1="100" y1="93" x2="100" y2="40" class="hour-hand" />
+      <line id="hour-hand-2"   x1="100" y1="93" x2="100" y2="87" class="hour-hand" />
+      <line id="minute-hand"   x1="100" y1="93" x2="100" y2="5"  class="minute-hand" />
+      <line id="minute-hand-2" x1="100" y1="93" x2="100" y2="85"  class="minute-hand" />
+      <line id="second-hand"   x1="100" y1="93" x2="100" y2="12" class="second-hand" />
+      <line id="second-hand-2" x1="100" y1="93" x2="100" y2="83" class="second-hand" />
+      <circle cx="100" cy="100" r="7" fill="url(#g3)" stroke="#979797" stroke-width="0.2" />
+    </g>
+  </svg>
+  <div id="copyright">&copy; 2017-2025 Silvino Rodrigues |
+    <input type="checkbox" id="pomodoro-checkbox"><label for="pomodoro-checkbox">Pomodoro</label> |
+    <input type="checkbox" id="digital-checkbox"><label for="digital-checkbox">Digital</label> |
+    <input type="text" maxlength="25" id="clock-name-input" placeholder="Face Name">
+  </div>
+
+  <script src="analog.js"></script>
+  <script src="jsclock.js"></script>
+  <script>
+    // Load the digital clock variant
+    document.getElementById("digital-checkbox").addEventListener("change", function() {
+      if (this.checked) {
+        window.location.href = 'index.html';
+      }
+    });
+
+    // fake keep alive
+    function fakeKeepAlive() { 
+      handleDebounce(); 
+      handleMouseMove(null);  
+    }
+
+    // New script for handling clock name input
+    document.getElementById("clock-name-input").addEventListener("input", function() {
+      const clockName = this.value;
+      document.getElementById("clock-name").textContent = clockName;
+      localStorage.setItem("clockName", clockName);
+      fakeKeepAlive();      
+    });
+
+    // Load saved clock name on page load
+    document.addEventListener("DOMContentLoaded", function() {
+      const savedClockName = localStorage.getItem("clockName");
+      if (savedClockName) {
+        document.getElementById("clock-name").textContent = savedClockName;
+        document.getElementById("clock-name-input").value = savedClockName;
+      }
+    });
+  </script>
+</body>
+</html>

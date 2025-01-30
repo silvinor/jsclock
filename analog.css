@@ -1,0 +1,68 @@
+/*
+ * jsClock - A simple analog clock with pomodoro timer
+ * Copyright (c) 2025 Silvino Rodrigues
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Radio+Canada+Big:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Libre+Bodoni:wght@400;700&display=swap");
+
+body#analog {
+  font-family: "Radio Canada Big";
+}
+#analog #clock {
+  width: initial;
+  height: initial;
+}
+.hour-marker { stroke: #434343; }
+.minute-marker { stroke: #434343; }
+.hour-hand { stroke: #1d1d1d; stroke-width: 3; }
+.minute-hand { stroke: #1d1d1d; stroke-width: 2.25; }
+.second-hand { stroke: #a35; stroke-width: 1.5; }
+.face-seconds {
+  font-family: "Libre Bodoni";
+  font-size: 8px;
+  font-weight: 400;
+}
+#clock-name {
+  font-family: "Libre Bodoni";
+  font-size: 10px;
+  font-weight: 900;
+  fill: #434343;
+  opacity: 0.5;
+}
+#date {
+  opacity: 0.667;
+}
+#date #dow-str,
+#date #day-str,
+#date #month-str {
+  font-size: 10px;
+  font-weight: 400;
+  fill: #1d1d1d;
+}
+#pomodoro #p1,
+#pomodoro #p2,
+#pomodoro #p3,
+#pomodoro #p4 {
+  opacity: 0.75;
+}
+#pomodoro #p5 {
+  opacity: 0.5;
+}
+
+#clock-name-input {
+  background-color: transparent;
+  border: 1px solid rgba(127, 127, 127, 0.25);
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 2px 5px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+#clock-name-input::placeholder {
+  color: rgba(127, 127, 127, 0.25);
+}
+#clock-name-input:focus {
+  border-bottom-color: rgba(127, 127, 127, 0.5);
+}

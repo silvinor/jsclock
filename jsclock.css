@@ -1,0 +1,74 @@
+/*
+ * jsClock - A simple digital clock with pomodoro timer
+ * Copyright (c) 2017-2025 Silvino Rodrigues
+ *
+ * Color Palette by Kate Morley > https://iamkate.com/data/12-bit-rainbow/ 
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap");
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  /* Stack elements vertically */
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #181818;
+  color: #eee;
+  font-family: "Raleway", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif;
+  cursor: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+#clock {
+  width: 50%;
+  height: auto;
+  pointer-events: none;
+}
+
+#pomodoro #p1,
+#pomodoro #p2,
+#pomodoro #p3,
+#pomodoro #p4 {
+  opacity: 0.667;
+}
+
+#pomodoro #p5 {
+  opacity: 0.333;
+}
+
+#copyright {
+  /* font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif; */
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(221, 221, 221, 0.75); /* #ddd */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 2s ease-in-out, visibility 2s ease-in-out;
+}
+
+#copyright.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+body,
+#clock,
+#copyright {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
