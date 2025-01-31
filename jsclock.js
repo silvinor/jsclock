@@ -43,6 +43,17 @@ var isMouseMoving = false;
 var copyrightTimeout = null;
 var isCopyrightVisible = false;
 
+// Truthy function
+function isTrue(value) {
+  if (typeof value === "string") value = value.trim().toLowerCase();
+  return value === true || 
+    value === "true" || 
+    value === "yes" || 
+    value === "y" || 
+    (typeof value === "number" && value !== 0);
+}
+
+// Checkbox, by Id, get if checked
 function isCheckboxCheckedById(checkboxId) {
   const checkbox = document.getElementById(checkboxId);
   if (checkbox && checkbox.type === 'checkbox') {
@@ -51,6 +62,7 @@ function isCheckboxCheckedById(checkboxId) {
   return false;
 }
 
+// Set content by Id
 function setContentById(elementId, newValue) {
   const element = document.getElementById(elementId);
   if (element && newValue !== element.textContent) {
@@ -58,6 +70,7 @@ function setContentById(elementId, newValue) {
   }
 }
 
+// Update SVG Clock
 function updateClock(now) {
   var hours = now.getHours();
   const tHourStr = (hours >= 12) ? "pm" : "am";
@@ -81,6 +94,7 @@ function updateClock(now) {
   setContentById("date-str", fullDateStr);
 }
 
+// Transform rotate by Id
 function transformRotateById(id, angle) {
   const element = document.getElementById(id);
   if (element) {
@@ -88,6 +102,7 @@ function transformRotateById(id, angle) {
   }
 }
 
+// Set visibility by Id
 function setVisibilityById(id, visible = true) {
   const element = document.getElementById(id);
   if (element) {
@@ -98,6 +113,7 @@ function setVisibilityById(id, visible = true) {
   }
 }
 
+// Set X and Width by Id (does not set Y and Height)
 function setXAndWidthById(id, x, width) {
   const element = document.getElementById(id);
   if (element) {
@@ -114,6 +130,7 @@ function setXAndWidthById(id, x, width) {
   }
 }
 
+// Update Pomodoro progress
 function updatePomodoro(now) {
   const minutes = now.getMinutes();
   const seconds = now.getSeconds();
@@ -143,6 +160,7 @@ function updatePomodoro(now) {
   }
 }
 
+// Update Title of the page (tab in browser)
 function updateTitle(now) {
   const hours = now.getHours();
   const minutes = now.getMinutes();
@@ -152,6 +170,7 @@ function updateTitle(now) {
   }
 }
 
+// Update all handlers
 async function updateAll() {
   if (isVisible) {
     const now = new Date();
@@ -170,6 +189,7 @@ async function updateAll() {
   }
 }
 
+// Visibility change handler
 async function visibilityChange() {
   if (document.visibilityState === "hidden") { 
     isVisible = false;
@@ -204,6 +224,7 @@ async function visibilityChange() {
   updateAll();
 }
 
+// Copyright bar visibility handler
 function handleCopyrightVisibility() {
   const copyrightElement = document.getElementById('copyright');
   if (isCopyrightVisible) {
@@ -219,6 +240,7 @@ function handleCopyrightVisibility() {
   copyrightTimeout = null; // must reset to pass `=== null` test
 }
 
+// Debounce handler
 function handleDebounce() {
   if (null !== debounceTimeout) clearTimeout(debounceTimeout);
   debounceTimeout = null;
@@ -229,6 +251,7 @@ function handleDebounce() {
   }
 }
 
+// Mouse move handler
 function handleMouseMove(event) {
   let eventX = (null === event) ? null : event.clientX;
   let eventY = (null === event) ? null : event.clientY;
@@ -248,6 +271,7 @@ function handleMouseMove(event) {
   }
 }
 
+// Key event handler
 function handleKeyEvent(event) {
   handleMouseMove(null);
 }
@@ -260,6 +284,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // ... rest of the existing code ...
 });
 
+// Double click handler
 function handleDoubleClick() {
   if (!document.fullscreenElement) {
     let element = document.documentElement;
@@ -279,11 +304,42 @@ function handleDoubleClick() {
   }
 }
 
+// Initialisation code
+async function performInit() {
+  console.info("Performing init");
+  if (!isTrue( clockInitialised = localStorage.getItem("clockInitialised") )) {
+    console.info("Loading settings");
+    fetch("clock-settings.json")
+      .then(response => {
+        if (!response.ok) console.info("Settings file not found");
+        return response.json();
+      })
+      .then(settings => {
+        // Store each root level setting in localStorage
+        Object.keys(settings).forEach(key => {
+          localStorage.setItem(key, settings[key]);
+        });
+        localStorage.setItem("clockInitialised", true);
+        location.reload(false);  // reload to get the settings
+      })
+      .catch(error => {
+        console.error("Error loading settings: ", error);
+        localStorage.setItem("clockInitialised", true);
+        return error
+      });
+  }
+  return Promise.resolve();
+}
+
 /**
- * Run on first load
+ * This get's run on first load
  */
 document.addEventListener("DOMContentLoaded", function() {
-  isPomodoroOn = localStorage.getItem("isPomodoroOn") === "true";
+  performInit();
+
+  console.info("DOMContentLoaded in `jsclock.js`");
+
+  isPomodoroOn = isTrue( localStorage.getItem("isPomodoroOn") );
   document.getElementById("pomodoro-checkbox").checked = isPomodoroOn;
   updateAll(); // Initialize clock immediately, first time run
 
@@ -306,7 +362,11 @@ document.addEventListener("DOMContentLoaded", function() {
     let wasPomodoroOn = isPomodoroOn;
     if (wasPomodoroOn !== this.checked) {
       isPomodoroOn = this.checked;
-      localStorage.setItem("isPomodoroOn", isPomodoroOn);
+      if (isPomodoroOn) {
+        localStorage.setItem("isPomodoroOn", isPomodoroOn);
+      } else {
+        localStorage.removeItem("isPomodoroOn");
+      }
       if (isPomodoroOn) {
         let now = new Date();
         if (isDigital) {

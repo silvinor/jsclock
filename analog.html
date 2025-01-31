@@ -75,8 +75,8 @@
     <input type="text" maxlength="25" id="clock-name-input" placeholder="Face Name">
   </div>
 
-  <script src="analog.js"></script>
   <script src="jsclock.js"></script>
+  <script src="analog.js"></script>
   <script>
     // Load the digital clock variant
     document.getElementById("digital-checkbox").addEventListener("change", function() {
@@ -85,22 +85,24 @@
       }
     });
 
-    // fake keep alive
-    function fakeKeepAlive() { 
-      handleDebounce(); 
-      handleMouseMove(null);  
-    }
-
     // New script for handling clock name input
     document.getElementById("clock-name-input").addEventListener("input", function() {
       const clockName = this.value;
       document.getElementById("clock-name").textContent = clockName;
-      localStorage.setItem("clockName", clockName);
-      fakeKeepAlive();      
+      if (clockName === "") {
+        localStorage.removeItem("clockName");
+      } else {
+        localStorage.setItem("clockName", clockName);
+      }
+
+      // fake keep alive
+      handleDebounce();
+      handleMouseMove(null);  
     });
 
     // Load saved clock name on page load
     document.addEventListener("DOMContentLoaded", function() {
+      console.info("DOMContentLoaded in `analog.html`");
       const savedClockName = localStorage.getItem("clockName");
       if (savedClockName) {
         document.getElementById("clock-name").textContent = savedClockName;
