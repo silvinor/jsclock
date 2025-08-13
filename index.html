@@ -98,7 +98,8 @@
       pointer-events: none;
     }
 
-    #time-str.odd .separator { opacity: 0.1; }
+    #time-str .separator { transition: opacity 0.25s ease; }
+    #time-str.odd .separator { opacity: 0.01; }
     #time-str.even .separator { opacity: 1; }
 
     /* Analog Clock */
@@ -192,7 +193,7 @@
   <!-- Digital clock -->
   <svg id="digital-clock" class="show" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120">
     <g font-family="var(--clock-font, inherit)">
-      <text id="time-str" x="0" y="40" text-anchor="begin" dominant-baseline="middle" font-size="85" fill="var(--time-color)" font-weight="700"><tspan id="hour-str">00</tspan><tspan class="separator">:</tspan><tspan id="mins-str">00</tspan></text>
+      <text id="time-str" x="5" y="40" text-anchor="begin" dominant-baseline="middle" font-size="85" fill="var(--time-color)" font-weight="700"><tspan id="hour-str">00</tspan><tspan class="separator">:</tspan><tspan id="mins-str">00</tspan></text>
       <text id="secs-str" x="230" y="25" text-anchor="begin" dominant-baseline="middle" font-size="55" fill="var(--seconds-color)" font-weight="700">00</text>
       <text id="hr12-str" x="230" y="65" text-anchor="begin" dominant-baseline="middle" font-size="35" fill="var(--ampm-color)" font-weight="400">am</text>
     </g>
@@ -673,6 +674,25 @@
       return ret;
     }
 
+    function processSettings(settings) {
+      const faceName = settings['faceName'];
+      if (faceName) {
+        document.getElementById("face-name").textContent = faceName;
+        document.getElementById("face-name-input").value = faceName;
+      }
+
+      const wantsAnalogOn = Boolean(settings['isAnalogOn']);
+      if (wantsAnalogOn) isAnalogOn = true;
+
+      const wantsPomodoroOn = Boolean(settings['isPomodoroOn']);
+      isPomodoroOn = wantsPomodoroOn;
+
+      const pomodoroWorkFor = Number(settings['pomodoroWorkFor']);
+      if (!Number.isNaN(pomodoroWorkFor)) pmdrWorkFor = pomodoroWorkFor;
+      const pomodoroRestFor = Number(settings['pomodoroRestFor']);
+      if (!Number.isNaN(pomodoroRestFor)) pmdrRestFor = pomodoroRestFor;
+    }
+
     // ----- Initialisation code -----
     async function performInit() {
       // console.info("Performing init");
@@ -687,35 +707,28 @@
             // Store each root level setting in localStorage
             Object.keys(settings).forEach(key => {
               safeSetItem(key, settings[key]);
+              // console.info(`Saving ${key} = ${settings[key]}`);
             });
             safeSetItem("clockInitialised", true);
-            // location.reload(false);  // reload to get the settings
+            processSettings(settings);
           })
           .catch(error => {
             console.error("Error loading settings: ", error);
             safeSetItem("clockInitialised", true);
             return error
           });
+      } else {
+        let settings = {};
+        try {
+          for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            settings[key] = localStorage.getItem(key);
+          }
+        } catch (err) {
+          console.error(`localStorage: ${err.name}, ${err.message}` );
+        }
+        processSettings(settings);
       }
-
-      const faceName = safeGetItem('faceName', false);
-      // console.info("Face Name = " + faceName);
-      if (faceName) {
-        document.getElementById("face-name").textContent = faceName;
-        document.getElementById("face-name-input").value = faceName;
-      }
-
-      const wantsAnalogOn = Boolean(localStorage.getItem("isAnalogOn"));
-      if (null !== wantsAnalogOn && true === wantsAnalogOn) isAnalogOn = true;
-
-      const wantsPomodoroOn = Boolean(safeGetItem('isPomodoroOn', isPomodoroOn));
-      isPomodoroOn = wantsPomodoroOn;
-
-      const pomodoroWorkFor = Number(safeGetItem('pomodoroWorkFor', pmdrWorkFor));
-      if (!Number.isNaN(pomodoroWorkFor)) pmdrWorkFor = pomodoroWorkFor;
-      const pomodoroRestFor = Number(safeGetItem('pomodoroRestFor', pmdrRestFor));
-      if (!Number.isNaN(pomodoroRestFor)) pmdrRestFor = pomodoroRestFor;
-
       return Promise.resolve();
     }
 
@@ -808,14 +821,11 @@
       const analogValue = params.get("analog");
       if (analogValue !== null) {
         isAnalogOn = isTrue(analogValue, false);
-      } else {
-        isAnalogOn = isTrue(safeGetItem("isAnalogOn"), false);
       }
       if (isAnalogOn) activateAnalog(true); // start the clock works, incl. saving state in localStorage
  
       drawAnalogClockFace();
 
-      isPomodoroOn = isTrue( safeGetItem("isPomodoroOn") );
       updateAll(); // Initialize clock immediately, first time run
 
       if ("wakeLock" in navigator) {
