@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
+  <style>
+    :root { 
+      font-family: system-ui, sans-serif;
+      color-scheme: dark;
+    }
+    body { 
+      background-color: #111; 
+      color: #eee;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    a {
+      color: inherit;
+    }
+  </style>
+  <script>
+    localStorage.setItem("isAnalogOn", true);
+    window.location.href = "index.html";
+  </script>
+</head>
+<body>
+  <p>Redirecting you <a href="index.html?analog">here</a> ...</p>
+</body>
+</html>
