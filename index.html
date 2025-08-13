@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
  * jsClock - A simple digital clock with pomodoro timer (one page version)
- * Copyright (c) 2017-2025 Silvino Rodrigues
+ * Copyright (c) 2017-2025 Silvino R.
  * @license MIT
  * @see https://github.com/silvinor/jsclock
 -->
@@ -9,152 +9,396 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-  <title>jsClock</title>
-	<meta http-equiv="refresh" content="14400"><!-- refresh every 4 hours -->
+  <title>Clock</title>
+	<meta http-equiv="refresh" content="12960"><!-- refresh every 3.6-hours (200 times per 30 days) -->
+  <meta name="color-scheme" content="dark">
 
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/gif" href="favicon.gif">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <!-- <link rel="icon" type="image/svg+xml" href="favicon.svg"> -->
+  <link rel="manifest" href="site.webmanifest">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      color-scheme: dark;
+
+      --font-root: Inter, system-ui, sans-serif;
+      --font-fancy: Raleway, serif;
+      --font-serif: "PT Serif", serif;
+
+      font-family: var(--font-root);
+      font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+      font-style: normal;
+
+      /* Digital */
+      --clock-font: var(--font-fancy);
+      --time-color: #ed0;
+      --seconds-color: #ddd;
+      --ampm-color: #777a;
+      --date-color: #09ca;
+
+      /* Analog */
+      --anlg-hmrk: #444;
+      --anlg-mmrk: #444;
+      --anlg-hour: #222e;
+      --anlg-mins: #222e;
+      --anlg-secs: #a35e;
+      --anlg-name: #146e;
+      --anlg-time: #333;
+      --anlg-fill: #aaa;
+
+      /* Pomodoro */
+      --pd-inactive-color: #5555;
+      --pd-rest-rem-color: #a35a;
+      --pd-rest-cur-color: #e94a;
+      --pd-work-rem-color: #4d8a;
+      --pd-work-cur-color: #36ba;
+    }
+    @supports (font-variation-settings: normal) {
+      :root { 
+        --font-root: InterVariable, system-ui, sans-serif;
+      }
+    }    
+
     body {
       margin: 0;
       display: flex;
-      flex-direction: column; /* Stack elements vertically */
+      flex-direction: column;
+      /* Stack elements vertically */
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-color: #181818;
+      background-color: #111;
       color: #eee;
-      font-family: "Raleway", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif; /* */
-			cursor: none; /* */
+      cursor: none;
     }
 
-    #clock {
-      width: 50%;
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Digital Clock */
+
+    #digital-clock {
+      width: 60%;
       height: auto;
       pointer-events: none;
     }
 
-    #pomodoro #p1,
-    #pomodoro #p2,
-    #pomodoro #p3,
-    #pomodoro #p4 {
-      opacity: 0.667;
-    }
-    #pomodoro #p5 {
-      opacity: 0.333;
+    #time-str.odd .separator { opacity: 0.1; }
+    #time-str.even .separator { opacity: 1; }
+
+    /* Analog Clock */
+
+    #analog-clock {
+      width: 66.667%;
+      height: auto;
+      max-height: 66.667%;
+      filter: drop-shadow(0 0 50px rgba(127, 127, 127, 0.5));
     }
 
-    #copyright {
+    .hour-marker { stroke: var(--anlg-hmrk); }
+    .minute-marker { stroke: var(--anlg-mmrk); }
+    .hour-hand { stroke: var(--anlg-hour); stroke-width: 3; }
+    .minute-hand { stroke: var(--anlg-mins); stroke-width: 2.25; }
+    .second-hand { stroke: var(--anlg-secs); stroke-width: 1.5; }
+    .face-seconds {
+      font-family: var(--font-serif);
+      font-size: 8px;
+      font-weight: 400;
+    }
+    #face-name {
+      font-family: var(--font-serif);
+      font-size: 10px;
+      font-weight: 900;
+      fill: var(--anlg-name);
+    }
+    #date {
+      opacity: 0.667;
+    }
+    #date #dow-str,
+    #date #day-str,
+    #date #mth-str {
+      font-family: var(--font-serif);
+      font-size: 10px;
+      font-weight: 400;
+    }
+
+    /* Footer */
+
+    #footer {
+      display: block;
       position: fixed;
       bottom: 0;
       width: 100%;
       text-align: center;
       padding: 10px;
       background: rgba(255, 255, 255, 0.05);
-      color: #ddd;
+      color: rgba(221, 221, 221, 0.75); /* #ddd */
       opacity: 0;
       visibility: hidden;
       transition: opacity 2s ease-in-out, visibility 2s ease-in-out;
     }
-    #copyright.visible {
+
+    #footer.show {
       opacity: 1;
       visibility: visible;
+      display: block;
     }
 
-    body, #clock, #copyright {
+    #face-name-input {
+      background-color: transparent;
+      border: 1px solid rgba(127, 127, 127, 0.25);
+      color: inherit;
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 2px 5px;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    #face-name-input::placeholder {
+      color: rgba(127, 127, 127, 0.25);
+    }
+    #face-name-input:focus {
+      border-bottom-color: rgba(127, 127, 127, 0.5);
+    }
+
+    body,
+    #digital-clock,
+    #analog-clock,
+    #footer {
       user-select: none;
       -webkit-user-select: none;
       -moz-user-select: none;
     }
+
+    .hide { display: none; }
   </style>
-  <!-- Color Palette by Kate Morley > https://iamkate.com/data/12-bit-rainbow/ -->
 </head>
-<body>
-  <svg id="clock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120">
-    <!-- <rect x="0" y="y" width="300" height="120" fill="none" stroke="red" stroke-width="1" stroke-dasharray="1" /> -->
+<body class="digital">
+  <!-- Digital clock -->
+  <svg id="digital-clock" class="show" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120">
+    <g font-family="var(--clock-font, inherit)">
+      <text id="time-str" x="0" y="40" text-anchor="begin" dominant-baseline="middle" font-size="85" fill="var(--time-color)" font-weight="700"><tspan id="hour-str">00</tspan><tspan class="separator">:</tspan><tspan id="mins-str">00</tspan></text>
+      <text id="secs-str" x="230" y="25" text-anchor="begin" dominant-baseline="middle" font-size="55" fill="var(--seconds-color)" font-weight="700">00</text>
+      <text id="hr12-str" x="230" y="65" text-anchor="begin" dominant-baseline="middle" font-size="35" fill="var(--ampm-color)" font-weight="400">am</text>
+    </g>
     <g font-family="inherit">
-      <text id="time-str" x="225" y="40" text-anchor="end" dominant-baseline="middle" font-size="85" fill="#ed0" font-weight="700">00:00</text>
-      <text id="secs-str" x="230" y="25" text-anchor="begin" dominant-baseline="middle" font-size="55" fill="#eee" font-weight="700">00</text>
-      <text id="hr12-str" x="230" y="65" text-anchor="begin" dominant-baseline="middle" font-size="35" fill="#858585" font-weight="400">am</text>
-      <text id="date-str" x="0" y="105" font-size="32" fill="#09c" font-weight="400" textLength="300" lengthAdjust="spacingAndGlyphs">If you see this, it's broken!</text>
+      <text id="date-str" x="0" y="108" font-size="32" fill="var(--date-color)" font-weight="400" textLength="300" lengthAdjust="spacingAndGlyphs">If you see this, it's broken!</text>
     </g>
     <g id="pomodoro" stroke="none">
-      <rect id="p5" x="200" y="118" width="100" height="2" fill="#4e4e4e" />
-      <rect id="p4" x="150" y="118" width="50" height="2" fill="#e94" />
-      <rect id="p3" x="100" y="118" width="50" height="2" fill="#a35" />
-      <rect id="p2" x="50" y="118" width="50" height="2" fill="#36b" />
-      <rect id="p1" x="0" y="118" width="50" height="2" fill="#4d8" />
+      <rect id="pd5" x="200" y="118" width="100" height="2" fill="var(--pd-inactive-color)" visibility="hidden"/>
+      <rect id="pd4" x="150" y="118" width="50" height="2" fill="var(--pd-rest-rem-color)" visibility="hidden"/>
+      <rect id="pd3" x="100" y="118" width="50" height="2" fill="var(--pd-rest-cur-color)" visibility="hidden"/>
+      <rect id="pd2" x="50" y="118" width="50" height="2" fill="var(--pd-work-rem-color)" visibility="hidden"/>
+      <rect id="pd1" x="0" y="118" width="50" height="2" fill="var(--pd-work-cur-color)" visibility="hidden"/>
     </g>
   </svg>
-  <div id="copyright">&copy; 2017-2025 Silvino Rodrigues</div>
-
+  <!-- Analog clock -->
+  <svg id="analog-clock" class="hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+    <defs>
+      <linearGradient id="g1" x1="100%" y1="0%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#bbb"/>
+        <stop offset="100%" stop-color="#eee"/>
+      </linearGradient>
+      <radialGradient id="g2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+        <stop offset="0%" stop-color="#eee"/>
+        <stop offset="100%" stop-color="#bbb"/>
+      </radialGradient>
+      <linearGradient id="g3" x1="100%" y1="0%" x2="0%" y2="0%">
+        <stop offset="0%" stop-color="#ddd"/>
+        <stop offset="100%" stop-color="#ccc"/>
+      </linearGradient>
+    </defs>
+    <g id="clock-face">
+      <circle cx="100" cy="100" r="100" stroke="none" fill="url(#g1)"/>
+      <circle cx="100" cy="100" r="80" stroke="none" fill="url(#g2)"/>
+      <text id="face-name" x="100" y="60" text-anchor="middle" dominant-baseline="middle"></text>
+      <circle id="face-ring" cx="100" cy="100" r="99" stroke-width="2" stroke="var(--anlg-name)" fill="none"/>
+    </g>
+    <g id="pomodoro" fill="none" stroke-width="2.5" stroke-linecap="butt">
+      <path id="pa5" visibility="hidden" stroke="var(--pd-inactive-color)"/>
+      <path id="pa4" visibility="hidden" stroke="var(--pd-rest-rem-color)"/>
+      <path id="pa3" visibility="hidden" stroke="var(--pd-rest-cur-color)"/>
+      <path id="pa2" visibility="hidden" stroke="var(--pd-work-rem-color)"/>
+      <path id="pa1" visibility="hidden" stroke="var(--pd-work-cur-color)"/>
+    </g>    
+    <g id="markers" stroke-linecap="round"></g>
+    <g id="date">
+      <g stroke="#aaa" stroke-width="0.2">
+        <rect x="120" y="94" width="20" height="12" rx="2" ry="2" fill="url(#g3)"/>
+        <rect x="140" y="94" width="15" height="12" rx="2" ry="2" fill="url(#g3)"/>
+        <rect x="155" y="94" width="20" height="12" rx="2" ry="2" fill="url(#g3)"/>
+      </g>
+      <g stroke="var(--anlg-time)" stroke-width="0.3" fill="var(--anlg-fill)">
+        <text id="dow-str"   x="130" y="101" textLength="16" text-anchor="middle" dominant-baseline="middle" lengthAdjust="spacingAndGlyphs"></text>
+        <text id="day-str"   x="147.5" y="101" textLength="11" text-anchor="middle" dominant-baseline="middle" lengthAdjust="spacingAndGlyphs"></text>
+        <text id="mth-str" x="165" y="101" textLength="16" text-anchor="middle" dominant-baseline="middle" lengthAdjust="spacingAndGlyphs"></text>
+      </g>
+    </g>
+    <g id="hands" stroke-linecap="round">
+      <line id="hour-hand"     x1="100" y1="93" x2="100" y2="40" class="hour-hand"/>
+      <line id="hour-hand-2"   x1="100" y1="93" x2="100" y2="87" class="hour-hand"/>
+      <line id="minute-hand"   x1="100" y1="93" x2="100" y2="5"  class="minute-hand"/>
+      <line id="minute-hand-2" x1="100" y1="93" x2="100" y2="85"  class="minute-hand"/>
+      <line id="second-hand"   x1="100" y1="93" x2="100" y2="12" class="second-hand"/>
+      <line id="second-hand-2" x1="100" y1="93" x2="100" y2="83" class="second-hand"/>
+      <circle cx="100" cy="100" r="7" fill="url(#g3)" stroke="#aaa" stroke-width="0.2"/>
+    </g>
+  </svg>
+  <!-- Footer -->
+  <footer id="footer">&copy; 2017-2025 Silvino R. | 
+    <input type="checkbox" id="pomodoro-checkbox"><label for="pomodoro-checkbox"> Pomodoro </label> |
+    <span id="analog-span" class="show"><input type="checkbox" id="analog-checkbox"><label for="analog-checkbox"> Analog </label></span>
+    <input class="hide" type="text" maxlength="25" id="face-name-input" placeholder="Face Name">
+  </footer>
+  
   <script>
     const months = new Array(
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December' );
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December' );
     const days = new Array(
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday' );
+      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' );
+    const CLOCK_REFRESH = 1000;
+    const FOOTER_SHOW_DURATION = 1000;
+    const FOOTER_HIDE_DURATION = 5000;
+    const DEBOUNCE_POLL_RATE = 200; // 25 minutes
 
     var isVisible = true;
-    const oldTitle = document.title;
+    const oGTitle = document.title;
     var wakeLockSupported = false;
     let wakeLock = null;
+    let clockInterval = null;
 
     var lastMousePosition = { x: null, y: null };
     var debounceTimeout = null;
     var isMouseMoving = false;
-    var copyrightTimeout = null;
-    var isCopyrightVisible = false;
+    var footerTimeout = null;
+    var isFooterVisible = false;
 
-    function setContentById(elementId, newValue) {
-      const element = document.getElementById(elementId);
-      if (element && newValue !== element.textContent) {
-        element.textContent = newValue;
+    let pmdrWorkFor = 25;
+    let pmdrRestFor = 5;
+
+    // --- vars as Objects, i.e. getter and setter pair :) ---
+
+    const analogCheckbox = document.getElementById("analog-checkbox");
+    Object.defineProperty(window, "isAnalogOn", {
+      get() { return analogCheckbox.checked; },
+      set(value) { analogCheckbox.checked = Boolean(value); }
+    });
+
+    const pomodoroCheckbox = document.getElementById("pomodoro-checkbox");
+    Object.defineProperty(window, "isPomodoroOn", {
+      get() { return pomodoroCheckbox.checked; },
+      set(value) { pomodoroCheckbox.checked = Boolean(value); }
+    });
+
+    /* ------------ Helpers ------------ */
+
+    // ----- Truthy function -----
+    function isTrue(value, fallback = true) {
+      if (value === undefined || value === null || value === '') return fallback;
+      if (typeof value === "string") {
+        value = value.trim().toLowerCase();
+        if (value.length > 0) value = value[0];
       }
+      const falseValues = [false, "0", 0, "n", "f"];
+      const trueValues = [true, "t", "y", "1", 1];
+      if (falseValues.includes(value)) return false;
+      if (trueValues.includes(value)) return true;
+      if (typeof value === "number") return value !== 0;
+      return fallback;
     }
 
+    // ----- Checkbox, by Id, get if checked -----
+    function isCheckboxCheckedById(checkboxId) {
+      const checkbox = document.getElementById(checkboxId);
+      if (checkbox && checkbox.type === 'checkbox') return checkbox.checked;
+      return false;
+    }
+
+    // ----- Set content by Id -----
+    function setContentById(elementId, newValue) {
+      const element = document.getElementById(elementId);
+      if (element && newValue !== element.textContent) element.textContent = newValue;
+    }
+
+    // ----- Update SVG Clock -----
     function updateClock(now) {
       var hours = now.getHours();
       const tHourStr = (hours >= 12) ? "pm" : "am";
       if (hours > 12) hours -= 12;
       const minutes = now.getMinutes();
       const seconds = now.getSeconds();
-
-      const timeStr = String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0');
-      const secsStr = String(seconds).padStart(2, '0');
-
-      setContentById("time-str", timeStr);
-      setContentById("secs-str", secsStr);
-      setContentById("hr12-str", tHourStr);
-
-      const year = now.getFullYear();
       const month = now.getMonth();
       const day = now.getDate();
       const weekday = now.getDay();
 
-      const fullDateStr = days[weekday] + ", " + day + " " + months[month] + " " + year;
-      setContentById("date-str", fullDateStr);
+      if (!isAnalogOn) {
+        // Digital
+
+        const hourStr = String(hours).padStart(2, '0');
+        const minsStr = String(minutes).padStart(2, '0');
+        const secsStr = String(seconds).padStart(2, '0');
+
+        setContentById("hour-str", hourStr);
+        setContentById("mins-str", minsStr);
+        toggleClassById("time-str", (seconds % 2 === 0), 'even', 'odd');
+        setContentById("secs-str", secsStr);
+        setContentById("hr12-str", tHourStr);
+
+        const year = now.getFullYear();
+        const fullDateStr = days[weekday] + ", " + day + " " + months[month] + " " + year;
+        setContentById("date-str", fullDateStr);
+
+      } else {
+        // Analog
+
+        const hourAngle = ((hours % 12) * 30) + (minutes * 0.5);
+        const minuteAngle = (minutes * 6) + (seconds * 0.1);
+        const secondAngle = seconds * 6;
+
+        transformRotateById("hour-hand", hourAngle);
+        transformRotateById("hour-hand-2", hourAngle + 180);
+        transformRotateById("minute-hand", minuteAngle);
+        transformRotateById("minute-hand-2", minuteAngle + 180);
+        transformRotateById("second-hand", secondAngle);
+        transformRotateById("second-hand-2", secondAngle + 180);
+
+        const monthStr = months[month].substring(0, 3).toUpperCase();
+        const weekdayStr = days[weekday].substring(0, 3).toUpperCase();
+
+        setContentById("dow-str", weekdayStr);
+        setContentById("day-str", day);
+        setContentById("mth-str", monthStr);
+
+      }
     }
 
-    function setVisibilityByEl(element, visible) {
+    // ----- Transform rotate by Id -----
+    function transformRotateById(id, angle) {
+      const element = document.getElementById(id);
+      if (element) {
+        element.setAttribute("transform", `rotate(${angle} 100 100)`);
+      }
+    }
+
+    // ----- Set visibility by Id, html visibility attribute -----
+    function setVisibilityById(id, visible = true) {
+      const element = document.getElementById(id);
       if (element) {
         let value = visible ? "visible" : "hidden";
         if (value !== element.getAttribute("visibility")) {
@@ -163,12 +407,33 @@
       }
     }
 
-    function setXAndWidthByEl(element, x, width) {
+    // ----- Toggle class names -----
+    function toggleClassById(id, first, class1, class2) {
+      let el = document.getElementById(id);
+      if (el) {
+        if (first) {
+          el.classList.remove(class2);
+          el.classList.add(class1);
+        } else {
+          el.classList.remove(class1);
+          el.classList.add(class2);
+        }
+      }
+    }
+
+    // ----- Set visibility by Id, with .show and .hide classes -----
+    function setShowClassById(id, visible = true) {
+      toggleClassById(id, visible, 'show', 'hide');
+    }
+
+    // ----- Set X and Width by Id (does not set Y and Height) -----
+    function setXAndWidthById(id, x, width) {
+      const element = document.getElementById(id);
       if (element) {
         let newX = x.toFixed(3);
         let newWidth = width.toFixed(3);
 
-        setVisibilityByEl(element, true);  // assume you want to see it
+        setVisibilityById(id, true);  // assume you want to see it
         if (element.getAttribute("x") !== newX) {
           element.setAttribute("x", newX);
         }
@@ -178,62 +443,109 @@
       }
     }
 
+    // ----- Draw pomodoro segments -----
+    function setRingSegmentPathById(id, startAngle, endAngle) {
+      // Convert angles from degrees to radians
+      const startRad = (startAngle - 90) * Math.PI / 180; // -90 to start at 12 o'clock
+      const endRad = (endAngle - 90) * Math.PI / 180;
+      
+      const radius = 78;
+      
+      // Calculate start and end points
+      const startX = (100 + radius * Math.cos(startRad)).toFixed(3);
+      const startY = (100 + radius * Math.sin(startRad)).toFixed(3);
+      const endX = (100 + radius * Math.cos(endRad)).toFixed(3);
+      const endY = (100 + radius * Math.sin(endRad)).toFixed(3);
+      
+      // Determine if we need the large arc flag
+      const diff = (endAngle < startAngle) ? (startAngle - endAngle) : (endAngle - startAngle);
+      const largeArcFlag = diff > 180 ? "1" : "0";
+      
+      // Create the SVG path with both large arc and sweep flags
+      const pathData =
+        `M ${startX} ${startY} ` +
+        `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`;
+      
+      // Update the path element
+
+      setVisibilityById(id, true);
+      document.getElementById(id).setAttribute("d", pathData);
+    }
+
+
+    // ----- Update Pomodoro progress -----
     function updatePomodoro(now) {
       const minutes = now.getMinutes();
       const seconds = now.getSeconds();
-
-      const maxVal = 30 * 60;
-      const divCut = 25 / 30;  // 25 min ON, 5 min REST
-      const svgWidth = 300;
+      const maxVal = (pmdrWorkFor + pmdrRestFor) * 60;
+      const splitAt = pmdrWorkFor / (pmdrWorkFor + pmdrRestFor);
 
       var progress = (minutes * 60) + seconds;
       while (progress > maxVal) progress -= maxVal;
       const percentage = progress / maxVal;
 
-      let p1 = document.getElementById("p1");
-      let p2 = document.getElementById("p2");
-      let p3 = document.getElementById("p3");
-      let p4 = document.getElementById("p4");
-      let p5 = document.getElementById("p5");
-      if (percentage <= divCut) {
-        let cut = percentage;
-        setXAndWidthByEl(p1, 0, cut * svgWidth);
-        setXAndWidthByEl(p2, cut * svgWidth, (divCut - cut) * svgWidth);
-        setVisibilityByEl(p3, false);
-        setVisibilityByEl(p4, false);
-        setXAndWidthByEl(p5, divCut * svgWidth, (1 - divCut) * svgWidth);
+      if (!isAnalogOn) {
+        // Digital
+        const knownSvgWidth = 300;
+
+        if (percentage <= splitAt) {
+          let cut = percentage;
+          setXAndWidthById("pd1", 0, cut * knownSvgWidth);
+          setXAndWidthById("pd2", cut * knownSvgWidth, (splitAt - cut) * knownSvgWidth);
+          setVisibilityById("pd3", false);
+          setVisibilityById("pd4", false);
+          setXAndWidthById("pd5", splitAt * knownSvgWidth, (1 - splitAt) * knownSvgWidth);
+        } else {
+          let cut = percentage - splitAt;
+          setVisibilityById("pd1", false);
+          setVisibilityById("pd2", false);
+          setXAndWidthById("pd3", splitAt * knownSvgWidth, cut * knownSvgWidth);
+          setXAndWidthById("pd4", (splitAt + cut) * knownSvgWidth, (1 - splitAt + cut) * knownSvgWidth);
+          setXAndWidthById("pd5", 0, splitAt * knownSvgWidth);
+        }
       } else {
-        let cut = percentage - divCut;
-        setVisibilityByEl(p1, false);
-        setVisibilityByEl(p2, false);
-        setXAndWidthByEl(p3, divCut * svgWidth, cut * svgWidth);
-        setXAndWidthByEl(p4, (divCut + cut) * svgWidth, (1 - divCut + cut) * svgWidth);
-        setXAndWidthByEl(p5, 0, divCut * svgWidth);
+        // Analog
+        const multiplier = 2;
+
+        if (percentage <= splitAt) {
+          setRingSegmentPathById("pa1", 0, percentage * 360);
+          setRingSegmentPathById("pa2", percentage * 360, splitAt * 360);
+          setVisibilityById("pa3", false);
+          setVisibilityById("pa4", false);
+          setRingSegmentPathById("pa5", splitAt * 360, 360);
+        } else {  
+          setVisibilityById("pa1", false);
+          setVisibilityById("pa2", false);
+          setRingSegmentPathById("pa3", splitAt * 360, percentage * 360);
+          setRingSegmentPathById("pa4", percentage * 360, 360);
+          setRingSegmentPathById("pa5", 0, splitAt * 360);
+        }
       }
     }
 
+    // ----- Update Title of the page (tab in browser) -----
     function updateTitle(now) {
       const hours = now.getHours();
       const minutes = now.getMinutes();
-			const title = String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0');
-      if (title !== document.title) {
-        document.title = title;
-      }
+      const title = String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0');
+      if (title !== document.title) document.title = title;
     }
 
+    // ----- Update all handlers -----
     async function updateAll() {
       if (isVisible) {
         const now = new Date();
         updateTitle(now);
         updateClock(now);
-        updatePomodoro(now);
+        if (isPomodoroOn) updatePomodoro(now);
       } else {
-        if (oldTitle !== document.title) {
-          document.title = oldTitle;
+        if (oGTitle !== document.title) {
+          document.title = oGTitle;
         }
       }
     }
 
+    // ----- Visibility change handler -----
     async function visibilityChange() {
       if (document.visibilityState === "hidden") { 
         isVisible = false;
@@ -248,10 +560,7 @@
           if (wakeLock === null) {
             try {
               wakeLock = await navigator.wakeLock.request("screen");
-              // console.info("Wake Lock is active");
-
               wakeLock.addEventListener("release", () => {
-                // console.info("Wake Lock has been released");
                 wakeLock = null;
               });
             } catch (err) {
@@ -271,30 +580,37 @@
       updateAll();
     }
 
-    function handleCopyrightVisibility() {
-      const copyrightElement = document.getElementById('copyright');
-      if (isCopyrightVisible) {
-        copyrightElement.classList.remove('visible');
-        isCopyrightVisible = false;
+    // ----- Footer bar visibility handler -----
+    function handleFooterVisibility() {
+      const footerElement = document.getElementById('footer');
+      if (isFooterVisible) {
+        footerElement.classList.remove('show');
+        document.body.style.cursor = 'none';
+        isFooterVisible = false;
       } else if (isMouseMoving) {
-        copyrightElement.classList.add('visible');
-        isCopyrightVisible = true;
+        footerElement.classList.add('show');
+        document.body.style.cursor = 'default';
+        isFooterVisible = true;
       }
-      clearTimeout(copyrightTimeout);
-      copyrightTimeout = null; // must reset to pass `=== null` test
+      clearTimeout(footerTimeout);
+      footerTimeout = null; // must reset to pass `=== null` test
     }
 
+    // ----- Debounce handler -----
     function handleDebounce() {
-      clearTimeout(debounceTimeout);
+      if (null !== debounceTimeout) clearTimeout(debounceTimeout);
+      debounceTimeout = null;
       isMouseMoving = false;
-      if (isCopyrightVisible && copyrightTimeout === null) {
-        copyrightTimeout = setTimeout(handleCopyrightVisibility, 5000);  
+      if (isFooterVisible) {
+        if (null !== footerTimeout) clearTimeout(footerTimeout); // reset
+        footerTimeout = setTimeout(handleFooterVisibility, FOOTER_HIDE_DURATION);  
       }
     }
 
+    // ----- Mouse move handler -----
     function handleMouseMove(event) {
-      let eventX = event.clientX;
-      let eventY = event.clientY;
+      let eventX = (null === event) ? null : event.clientX;
+      let eventY = (null === event) ? null : event.clientY;
       if (
         lastMousePosition.x === null ||
         lastMousePosition.y === null ||
@@ -302,15 +618,21 @@
       ) {
         isMouseMoving = true;
         clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(handleDebounce, 200);
+        debounceTimeout = setTimeout(handleDebounce, DEBOUNCE_POLL_RATE);
         lastMousePosition.x = eventX;
         lastMousePosition.y = eventY;
-        if (!isCopyrightVisible && copyrightTimeout === null) {
-          copyrightTimeout = setTimeout(handleCopyrightVisibility, 1000);  
+        if (!isFooterVisible && footerTimeout === null) {
+          footerTimeout = setTimeout(handleFooterVisibility, FOOTER_SHOW_DURATION);  
         }
       }
     }
 
+    // ----- Key event handler -----
+    function handleKeyEvent(event) {
+      handleMouseMove(null);
+    }
+
+    // ----- Double click handler -----
     function handleDoubleClick() {
       if (!document.fullscreenElement) {
         let element = document.documentElement;
@@ -330,10 +652,170 @@
       }
     }
 
+    function safeSetItem(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (err) {
+        console.error(`localStorage.setItem: ${err.name}, ${err.message}` );
+      }
+    }
+
+    function safeGetItem(key, fallback = false) {
+      var ret;
+      try {
+        ret = localStorage.getItem(key);
+      } catch (err) {
+        console.error(`localStorage.setItem: ${err.name}, ${err.message}` );
+        return fallback;
+      }
+      // console.info('for: ' + key + ', ret = ' + ret);
+      if (null === ret) return fallback; // not there, fallback
+      return ret;
+    }
+
+    // ----- Initialisation code -----
+    async function performInit() {
+      // console.info("Performing init");
+      if (!isTrue( clockInitialised = safeGetItem("clockInitialised"), false )) {
+        // console.info("Loading settings");
+        fetch("config.json")
+          .then(response => {
+            // if (!response.ok) console.info("Settings file not found");
+            return response.json();
+          })
+          .then(settings => {
+            // Store each root level setting in localStorage
+            Object.keys(settings).forEach(key => {
+              safeSetItem(key, settings[key]);
+            });
+            safeSetItem("clockInitialised", true);
+            // location.reload(false);  // reload to get the settings
+          })
+          .catch(error => {
+            console.error("Error loading settings: ", error);
+            safeSetItem("clockInitialised", true);
+            return error
+          });
+      }
+
+      const faceName = safeGetItem('faceName', false);
+      // console.info("Face Name = " + faceName);
+      if (faceName) {
+        document.getElementById("face-name").textContent = faceName;
+        document.getElementById("face-name-input").value = faceName;
+      }
+
+      const wantsAnalogOn = Boolean(localStorage.getItem("isAnalogOn"));
+      if (null !== wantsAnalogOn && true === wantsAnalogOn) isAnalogOn = true;
+
+      const wantsPomodoroOn = Boolean(safeGetItem('isPomodoroOn', isPomodoroOn));
+      isPomodoroOn = wantsPomodoroOn;
+
+      const pomodoroWorkFor = Number(safeGetItem('pomodoroWorkFor', pmdrWorkFor));
+      if (!Number.isNaN(pomodoroWorkFor)) pmdrWorkFor = pomodoroWorkFor;
+      const pomodoroRestFor = Number(safeGetItem('pomodoroRestFor', pmdrRestFor));
+      if (!Number.isNaN(pomodoroRestFor)) pmdrRestFor = pomodoroRestFor;
+
+      return Promise.resolve();
+    }
+
+    // ----- Swap modes function, digital<->analog -----
+    function activateAnalog(active) {
+      if (active) {
+        document.body.classList.remove("digital");
+        document.body.classList.add("analog");
+        setShowClassById("digital-clock", false);
+        setShowClassById("analog-clock", true);
+        safeSetItem("isAnalogOn", true);
+        setShowClassById('face-name-input', true);
+        isAnalogOn = true;
+      } else {
+        document.body.classList.remove("analog");
+        document.body.classList.add("digital");
+        setShowClassById("analog-clock", false);
+        setShowClassById("digital-clock", true);
+        localStorage.removeItem("isAnalogOn");
+        setShowClassById('face-name-input', false);
+        isAnalogOn = false;
+      }
+      updateAll();
+    }
+
+    function setSvgLineAttributes(line, x1, y1, x2, y2, className, strokeWidth, rotate = 0) {
+      line.setAttribute("x1", x1);
+      line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2);
+      line.setAttribute("y2", y2);
+      line.setAttribute("class", className);
+      line.setAttribute("stroke-width", strokeWidth);
+      if (rotate !== 0) {
+        line.setAttribute("transform", `rotate(${rotate} 100 100)`);
+      }
+    }
+
+    function drawAnalogClockFace() {
+      const svg = document.getElementById('analog-clock');
+      const markers = document.getElementById('markers');
+
+      // 12 o'clock position
+      for (let i = 0; i < 2; i++) {
+        let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        setSvgLineAttributes(line, 100 + (i == 0 ? -2 : 2), 4.75, 100 + (i == 0 ? -2 : 2), 18, "hour-marker", 2);
+        markers.appendChild(line);
+      }
+
+      // 1 to 11 o'clock positions
+      for (let i = 1; i < 12; i++) {
+        let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        setSvgLineAttributes(line, 100, 12, 100, 18, "hour-marker", 2, i * 30);
+        markers.appendChild(line);
+      }
+
+      // 1 to 11 o'clock numbers
+      for (let i = 1; i < 12; i++) {
+        let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", "100");
+        text.setAttribute("y", "7");
+        text.setAttribute("class", "face-seconds");
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("dominant-baseline", "middle");
+        text.textContent = i * 5;        
+        text.setAttribute("transform", `rotate(${i * 30} 100 100)`);
+        markers.appendChild(text);
+      }
+
+      // 5 minute markers
+      for (let i = 0; i < 60; i++) {
+        if (i % 5 !== 0) {
+          let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          setSvgLineAttributes(line, 100, 5, 100, 10, "minute-marker", 1, i * 6);
+          markers.appendChild(line);
+        }
+      }
+    }
+
+    /* ============ Core / Main code ============ */
+
     /**
-     * Run on first load
+     * This get's run on first load
      */
     document.addEventListener("DOMContentLoaded", function() {
+
+      performInit();
+
+
+      const params = new URLSearchParams(window.location.search);
+      const analogValue = params.get("analog");
+      if (analogValue !== null) {
+        isAnalogOn = isTrue(analogValue, false);
+      } else {
+        isAnalogOn = isTrue(safeGetItem("isAnalogOn"), false);
+      }
+      if (isAnalogOn) activateAnalog(true); // start the clock works, incl. saving state in localStorage
+ 
+      drawAnalogClockFace();
+
+      isPomodoroOn = isTrue( safeGetItem("isPomodoroOn") );
       updateAll(); // Initialize clock immediately, first time run
 
       if ("wakeLock" in navigator) {
@@ -344,12 +826,53 @@
         console.warn("Screen Wake Lock API is not supported on this browser");
       }
 
+
       document.addEventListener("visibilitychange", visibilityChange);
       window.addEventListener("resize", visibilityChange);
       document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("keydown", handleKeyEvent);
+      document.addEventListener("keyup", handleKeyEvent);
       document.addEventListener("dblclick", handleDoubleClick);
 
-      setInterval(updateAll, 1000); // Start the update loop
+      document.getElementById("pomodoro-checkbox").addEventListener("change", function() {
+        // this.checked is not needed, since `isPomodoroOn` getter will get that
+        if (isPomodoroOn) {
+          safeSetItem("isPomodoroOn", isPomodoroOn);
+        } else {
+          localStorage.removeItem("isPomodoroOn");
+        }
+
+        if (isPomodoroOn) {
+          let now = new Date();
+          updatePomodoro(now);
+        } else {
+          for (let i = 1; i <= 5; i++) {
+            setVisibilityById("pd"+i, false);
+            setVisibilityById("pa"+i, false);
+          }
+        }
+      });
+
+      document.getElementById("analog-checkbox").addEventListener("change", function() {
+        activateAnalog(this.checked);
+      });
+
+      document.getElementById("face-name-input").addEventListener("input", function() {
+        const faceName = this.value;
+        document.getElementById("face-name").textContent = faceName;
+        if (faceName === "") {
+          localStorage.removeItem("faceName");
+        } else {
+          safeSetItem("faceName", faceName);
+        }
+
+        // fake keep alive
+        handleDebounce();
+        handleMouseMove(null);  
+      });
+
+      // START THE CLOCK!!
+      clockInterval = setInterval(updateAll, CLOCK_REFRESH); // Start the update loop
     });
   </script>
 </body>
