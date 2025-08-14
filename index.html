@@ -152,6 +152,7 @@
       opacity: 0;
       visibility: hidden;
       transition: opacity 2s ease-in-out, visibility 2s ease-in-out;
+      z-index: 99;
     }
 
     #footer.show {
@@ -160,7 +161,8 @@
       display: block;
     }
 
-    #face-name-input {
+    input[type="text"],
+    input[type="number"] {
       background-color: transparent;
       border: 1px solid rgba(127, 127, 127, 0.25);
       color: inherit;
@@ -170,11 +172,25 @@
       outline: none;
       transition: border-color 0.3s ease;
     }
-    #face-name-input::placeholder {
+    input[type="text"] {
+      width: 8rem;
+    }
+    input[type="number"] {
+      width: 2.25rem;
+    }
+    input::placeholder {
       color: rgba(127, 127, 127, 0.25);
     }
-    #face-name-input:focus {
+    input:focus {
       border-bottom-color: rgba(127, 127, 127, 0.5);
+    }
+    label.small {
+      font-size: 0.75rem;
+    }
+    input:focus,
+    textarea:focus,
+    select:focus {
+      box-shadow: 0 0 6px 2px rgba(0, 150, 250, 0.4);
     }
 
     body,
@@ -262,10 +278,14 @@
   </svg>
   <!-- Footer -->
   <footer id="footer">&copy; 2017-2025 Silvino R. | 
-    <input type="checkbox" id="pomodoro-checkbox"> <label for="pomodoro-checkbox">Pomodoro</label>
-    <span class="sound-span hide">&raquo; <input type="checkbox" id="sound-checkbox"> <label for="sound-checkbox">&#x266B;</label></span>
+    <input type="checkbox" id="pomodoro-checkbox"> <label for="pomodoro-checkbox"><u>P</u>omodoro</label>
+    <span class="sound-span hide">&raquo;
+      <label class="small" for="work-for-input">Work</label> <input type="number" id="work-for-input" min="1" max="120"> ;
+      <label class="small" for="rest-for-input">Rest</label> <input type="number" id="rest-for-input" min="1" max="120"> ;
+      <input type="checkbox" id="sound-checkbox"> <label for="sound-checkbox">&#x266B;</label>
+    </span>
     |
-    <span id="analog-span" class="show"><input type="checkbox" id="analog-checkbox"> <label for="analog-checkbox">Analog</label></span>
+    <span id="analog-span" class="show"><input type="checkbox" id="analog-checkbox"> <label for="analog-checkbox"><u>A</u>nalog</label></span>
     <span class="analog-span hide">&raquo; <input type="text" maxlength="25" id="face-name-input" placeholder="Face Name"></span>
   </footer>
   
@@ -353,12 +373,12 @@
       return fallback;
     }
 
-    // ----- Checkbox, by Id, get if checked -----
-    function isCheckboxCheckedById(checkboxId) {
-      const checkbox = document.getElementById(checkboxId);
-      if (checkbox && checkbox.type === 'checkbox') return checkbox.checked;
-      return false;
-    }
+    // // ----- Checkbox, by Id, get if checked -----
+    // function getCheckboxCheckedById(checkboxId) {
+    //   const checkbox = document.getElementById(checkboxId);
+    //   if (checkbox && checkbox.type === 'checkbox') return checkbox.checked;
+    //   return false;
+    // }
 
     // ----- Set content by Id -----
     function setContentById(elementId, newValue) {
@@ -420,21 +440,33 @@
 
     // ----- Transform rotate by Id -----
     function transformRotateById(id, angle) {
-      const element = document.getElementById(id);
-      if (element) {
-        element.setAttribute("transform", `rotate(${angle} 100 100)`);
+      const el = document.getElementById(id);
+      if (el) {
+        el.setAttribute("transform", `rotate(${angle} 100 100)`);
       }
+    }
+
+    // ----- -----
+    function setAttributeById(id, attribute, value) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.setAttribute(attribute, value);
+      }
+    }
+
+    // ----- ----
+    function getAttributeById(id, attr) {
+      const el = document.getElementById(id);
+      if (el) {
+        return el.getAttribute(attr);
+      }
+      return false;
     }
 
     // ----- Set visibility by Id, html visibility attribute -----
     function setVisibilityById(id, visible = true) {
-      const element = document.getElementById(id);
-      if (element) {
-        let value = visible ? "visible" : "hidden";
-        if (value !== element.getAttribute("visibility")) {
-          element.setAttribute("visibility", value);
-        }
-      }
+      let value = visible ? "visible" : "hidden";
+      setAttributeById(id, 'visibility', value);
     }
 
     // ----- Toggle class names -----
@@ -456,6 +488,7 @@
       toggleClassById(id, visible, 'show', 'hide');
     }
 
+    // ----- -----
     function toggleClassByClass(classN, first, class1, class2) {
       const nodes = document.querySelectorAll(`.${classN}`);
       nodes.forEach(el => {
@@ -469,6 +502,7 @@
       });
     }
 
+    // ----- -----
     function setShowClassByClass(classN, visible = true) {
       toggleClassByClass(classN, visible, 'show', 'hide');
     }    
@@ -532,7 +566,7 @@
       const percentage = progress / maxVal;
 
       if (isSoundOn) {
-        if (percentage == splitAt) {
+        if (Math.round(percentage * 1000) === Math.round(splitAt * 1000)) {
           playSound(tone1);
         }
         if (percentage == 1) {
@@ -602,7 +636,7 @@
     }
 
     // ----- Visibility change handler -----
-    async function visibilityChange() {
+    async function handleVisibilityChange(event) {
       if (document.visibilityState === "hidden") { 
         isVisible = false;
       } else if (document.visibilityState === "visible") {
@@ -637,7 +671,7 @@
     }
 
     // ----- Footer bar visibility handler -----
-    function handleFooterVisibility() {
+    function handleFooterVisibility(event) {
       const footerElement = document.getElementById('footer');
       if (isFooterVisible) {
         footerElement.classList.remove('show');
@@ -653,7 +687,7 @@
     }
 
     // ----- Debounce handler -----
-    function handleDebounce() {
+    function handleDebounce(event) {
       if (null !== debounceTimeout) clearTimeout(debounceTimeout);
       debounceTimeout = null;
       isMouseMoving = false;
@@ -689,7 +723,8 @@
     }
 
     // ----- Double click handler -----
-    function handleDoubleClick() {
+    function handleDoubleClick(event) {
+      if (event.target.closest('footer') !== null) return;
       if (!document.fullscreenElement) {
         let element = document.documentElement;
         if (element.requestFullscreen) {
@@ -708,6 +743,131 @@
       }
     }
 
+    // ----- Handle Pomodoro activation -----
+    function handlePomodoroSwitchChange(event) {
+      // this.checked is not needed, since `isPomodoroOn` getter will get that
+      if (isPomodoroOn) {
+        safeSetItem("isPomodoroOn", isPomodoroOn);
+      } else {
+        localStorage.removeItem("isPomodoroOn");
+      }
+      if (isPomodoroOn) {
+        let now = new Date();
+        updatePomodoro(now);
+      } else {
+        for (let i = 1; i <= 5; i++) {
+          setVisibilityById("pd"+i, false);
+          setVisibilityById("pa"+i, false);
+        }
+      }
+      setShowClassByClass('sound-span', isPomodoroOn);
+    }
+
+    // ----- -----
+    function getValueById(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        return el.value;
+      } else
+        return false;
+    }
+
+    // ----- -----
+    function handlePomodoroValueChange(event) {
+      const savedWork = safeGetItem('pomodoroWorkFor', false);
+      const savedRest = safeGetItem('pomodoroRestFor', false);
+      const wantedWork = getValueById('work-for-input');
+      const wantedRest = getValueById('rest-for-input');
+
+      if ((savedWork != wantedWork) || (savedRest != wantedRest)) {
+        if (wantedWork && (savedWork != wantedWork)) {
+          safeSetItem('pomodoroWorkFor', wantedWork);
+          pmdrWorkFor = Number(wantedWork);
+        }
+        if (wantedRest && (savedRest != wantedRest)) {
+          safeSetItem('pomodoroRestFor', wantedRest);
+          pmdrRestFor = Number(wantedRest);
+        }
+        let now = new Date();
+        updatePomodoro(now);
+      }
+    }
+
+    // ----- -----
+    function handleAnalogChange(event) {
+      activateAnalog(isAnalogOn);
+    }
+
+    // ----- -----
+    async function handleSoundChange(event) {
+      try {
+        if (this.checked) {
+          // user gesture: safe to create/resume and load sounds
+          audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === "suspended") await audioCtx.resume();
+          if (!(tone1 instanceof AudioBuffer)) tone1 = await loadSound("tone1.mp3");
+          if (!(tone2 instanceof AudioBuffer)) tone2 = await loadSound("tone2.mp3");
+        } else {
+          // turn sound off
+          if (audioCtx && audioCtx.state !== "closed") await audioCtx.suspend();
+        }
+      } catch (err) {
+        __(`Sound toggle failed: ${err.name} ${err.message}`, 0);
+      }
+    }
+
+    // ----- -----
+    function handelFaceNameChange(event) {
+      const faceName = this.value;
+      document.getElementById("face-name").textContent = faceName;
+      if (faceName === "") {
+        localStorage.removeItem("faceName");
+      } else {
+        safeSetItem("faceName", faceName);
+      }
+
+      // fake keep alive
+      handleDebounce();
+      handleMouseMove(null);  
+    }
+
+    // ----- -----
+    function isTypingInInput(event) {
+      const target = event.target;
+      return target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+    }    
+
+    // ----- -----
+    function handleKeyPress(event) {
+
+      if ((event.key.toLowerCase() === 'p') && (!isTypingInInput(event))) {
+        const el = document.getElementById('pomodoro-checkbox');
+        if (el) {
+          el.checked = !el.checked;
+        }
+        handlePomodoroSwitchChange(event);
+      }
+
+      if ((event.key.toLowerCase() === 'a') && (!isTypingInInput(event))) {
+        const el = document.getElementById('analog-checkbox');
+        if (el) {
+          el.checked = !el.checked;
+        }
+        handleAnalogChange(event);
+      }
+
+      if (isPomodoroOn && (event.key.toLowerCase() === 's') && (!isTypingInInput(event))) {
+        const el = document.getElementById('sound-checkbox');
+        if (el) {
+          el.checked = !el.checked;
+        }
+        handleSoundChange(event);
+      }
+
+
+    }
+
+    // ----- -----
     function safeSetItem(key, value) {
       try {
         localStorage.setItem(key, value);
@@ -716,6 +876,7 @@
       }
     }
 
+    // ----- -----
     function safeGetItem(key, fallback = false) {
       var ret;
       try {
@@ -728,6 +889,7 @@
       return ret;
     }
 
+    // ----- -----
     function processConfig(config) {
       if (typeof config !== 'object') return;
 
@@ -748,6 +910,9 @@
       if (!Number.isNaN(pomodoroWorkFor)) pmdrWorkFor = pomodoroWorkFor;
       const pomodoroRestFor = Number(config['pomodoroRestFor']);
       if (!Number.isNaN(pomodoroRestFor)) pmdrRestFor = pomodoroRestFor;
+
+      setAttributeById('work-for-input', 'value', pmdrWorkFor);
+      setAttributeById('rest-for-input', 'value', pmdrRestFor);
     }
 
     // ----- Initialisation code -----
@@ -766,7 +931,6 @@
       }
 
       const isInitialised = safeGetItem('clockInitialised', false);
-      __(isInitialised);
       if (false == isInitialised) {
         __('Loading config from file');
         fetch("config.json")
@@ -815,6 +979,7 @@
       updateAll();
     }
 
+    // ----- -----
     function setSvgLineAttributes(line, x1, y1, x2, y2, className, strokeWidth, rotate = 0) {
       line.setAttribute("x1", x1);
       line.setAttribute("y1", y1);
@@ -827,6 +992,7 @@
       }
     }
 
+    // ----- -----
     function drawAnalogClockFace() {
       const svg = document.getElementById('analog-clock');
       const markers = document.getElementById('markers');
@@ -868,6 +1034,7 @@
       }
     }
 
+    // ----- -----
     async function loadSound(url) {
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
       const res = await fetch(url); // same-origin fetch is fine
@@ -893,6 +1060,7 @@
       return decoded;
     }
 
+    // ----- -----
     function playSound(buffer) {
       if (!(buffer instanceof AudioBuffer) || !audioCtx) return;
       const src = audioCtx.createBufferSource();
@@ -930,73 +1098,26 @@
 
       if ("wakeLock" in navigator) {
         wakeLockSupported = true;
-        visibilityChange(); // first time run
+        handleVisibilityChange(null); // first time run, fake it
       } else {
         __("Screen Wake Lock API is not supported on this browser", 1);
       }
 
-      document.addEventListener("visibilitychange", visibilityChange);
-      window.addEventListener("resize", visibilityChange);
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("keydown", handleKeyEvent);
-      document.addEventListener("keyup", handleKeyEvent);
-      document.addEventListener("dblclick", handleDoubleClick);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      window.addEventListener('resize', handleVisibilityChange);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('keydown', handleKeyEvent);
+      document.addEventListener('keyup', handleKeyEvent);
+      document.body.addEventListener('dblclick', handleDoubleClick);
 
-      document.getElementById("pomodoro-checkbox").addEventListener("change", function() {
-        // this.checked is not needed, since `isPomodoroOn` getter will get that
-        if (isPomodoroOn) {
-          safeSetItem("isPomodoroOn", isPomodoroOn);
-        } else {
-          localStorage.removeItem("isPomodoroOn");
-        }
-        
-        if (isPomodoroOn) {
-          let now = new Date();
-          updatePomodoro(now);
-        } else {
-          for (let i = 1; i <= 5; i++) {
-            setVisibilityById("pd"+i, false);
-            setVisibilityById("pa"+i, false);
-          }
-        }
+      document.getElementById('pomodoro-checkbox').addEventListener('change', handlePomodoroSwitchChange);
+      document.getElementById('analog-checkbox').addEventListener('change', handleAnalogChange);
+      document.getElementById('sound-checkbox').addEventListener('change', handleSoundChange);
+      document.getElementById('face-name-input').addEventListener('input', handelFaceNameChange);
+      document.getElementById('work-for-input').addEventListener('input', handlePomodoroValueChange);
+      document.getElementById('rest-for-input').addEventListener('input', handlePomodoroValueChange);
 
-        setShowClassByClass('sound-span', isPomodoroOn);
-      });
-
-      document.getElementById("analog-checkbox").addEventListener("change", function() {
-        activateAnalog(this.checked);
-      });
-
-      document.getElementById("sound-checkbox").addEventListener("change", async function() {
-        try {
-          if (this.checked) {
-            // user gesture: safe to create/resume and load sounds
-            audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === "suspended") await audioCtx.resume();
-            if (!(tone1 instanceof AudioBuffer)) tone1 = await loadSound("tone1.mp3");
-            if (!(tone2 instanceof AudioBuffer)) tone2 = await loadSound("tone2.mp3");
-          } else {
-            // turn sound off
-            if (audioCtx && audioCtx.state !== "closed") await audioCtx.suspend();
-          }
-        } catch (err) {
-          __(`Sound toggle failed: ${err.name} ${err.message}`, 0);
-        }
-      });
-
-      document.getElementById("face-name-input").addEventListener("input", function() {
-        const faceName = this.value;
-        document.getElementById("face-name").textContent = faceName;
-        if (faceName === "") {
-          localStorage.removeItem("faceName");
-        } else {
-          safeSetItem("faceName", faceName);
-        }
-
-        // fake keep alive
-        handleDebounce();
-        handleMouseMove(null);  
-      });
+      document.addEventListener('keydown', handleKeyPress);
 
       // START THE CLOCK!!
       clockInterval = setInterval(updateAll, CLOCK_REFRESH); // Start the update loop
