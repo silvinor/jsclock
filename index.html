@@ -262,9 +262,11 @@
   </svg>
   <!-- Footer -->
   <footer id="footer">&copy; 2017-2025 Silvino R. | 
-    <input type="checkbox" id="pomodoro-checkbox"><label for="pomodoro-checkbox"> Pomodoro </label> |
-    <span id="analog-span" class="show"><input type="checkbox" id="analog-checkbox"><label for="analog-checkbox"> Analog </label></span>
-    <input class="hide" type="text" maxlength="25" id="face-name-input" placeholder="Face Name">
+    <input type="checkbox" id="pomodoro-checkbox"> <label for="pomodoro-checkbox">Pomodoro</label>
+    <span class="sound-span hide">&raquo; <input type="checkbox" id="sound-checkbox"> <label for="sound-checkbox">&#x266B;</label></span>
+    |
+    <span id="analog-span" class="show"><input type="checkbox" id="analog-checkbox"> <label for="analog-checkbox">Analog</label></span>
+    <span class="analog-span hide">&raquo; <input type="text" maxlength="25" id="face-name-input" placeholder="Face Name"></span>
   </footer>
   
   <script>
@@ -278,7 +280,8 @@
     const FOOTER_HIDE_DURATION = 5000;
     const DEBOUNCE_POLL_RATE = 200; // 25 minutes
 
-    var isVisible = true;
+    let isVisible = true;
+    let isDebug = false;
     const oGTitle = document.title;
     var wakeLockSupported = false;
     let wakeLock = null;
@@ -290,8 +293,12 @@
     var footerTimeout = null;
     var isFooterVisible = false;
 
-    let pmdrWorkFor = 25;
-    let pmdrRestFor = 5;
+    let pmdrWorkFor = 25; // default
+    let pmdrRestFor = 5; // default
+
+    let audioCtx;
+    let tone1 = null;
+    let tone2 = null;
 
     // --- vars as Objects, i.e. getter and setter pair :) ---
 
@@ -307,19 +314,41 @@
       set(value) { pomodoroCheckbox.checked = Boolean(value); }
     });
 
+    const soundCheckbox = document.getElementById("sound-checkbox");
+    Object.defineProperty(window, "isSoundOn", {
+      get() { return soundCheckbox.checked; },
+      set(value) { soundCheckbox.checked = Boolean(value); }
+    });
+
     /* ------------ Helpers ------------ */
+
+    function __(msg, level = 3) {
+      // Level: 0 = error, 1 = warn, 2 = info, >=3 = log
+      if (level <= 0) {
+        console.error(msg);
+      } else if (level == 1) {
+        console.warn(msg);
+      } else if (isDebug) {
+        if (level == 2) {
+          console.info(msg);
+        } else {
+          console.log(msg);
+        }
+      }
+    }
 
     // ----- Truthy function -----
     function isTrue(value, fallback = true) {
+      if (typeof value === "boolean") return value;
       if (value === undefined || value === null || value === '') return fallback;
       if (typeof value === "string") {
         value = value.trim().toLowerCase();
         if (value.length > 0) value = value[0];
       }
-      const falseValues = [false, "0", 0, "n", "f"];
-      const trueValues = [true, "t", "y", "1", 1];
-      if (falseValues.includes(value)) return false;
+      const trueValues = ["t", "y", "1", 1];
       if (trueValues.includes(value)) return true;
+      const falseValues = ["0", 0, "n", "f"];
+      if (falseValues.includes(value)) return false;
       if (typeof value === "number") return value !== 0;
       return fallback;
     }
@@ -427,6 +456,23 @@
       toggleClassById(id, visible, 'show', 'hide');
     }
 
+    function toggleClassByClass(classN, first, class1, class2) {
+      const nodes = document.querySelectorAll(`.${classN}`);
+      nodes.forEach(el => {
+        if (first) {
+          el.classList.remove(class2);
+          el.classList.add(class1);
+        } else {
+          el.classList.remove(class1);
+          el.classList.add(class2);
+        }
+      });
+    }
+
+    function setShowClassByClass(classN, visible = true) {
+      toggleClassByClass(classN, visible, 'show', 'hide');
+    }    
+
     // ----- Set X and Width by Id (does not set Y and Height) -----
     function setXAndWidthById(id, x, width) {
       const element = document.getElementById(id);
@@ -485,6 +531,15 @@
       while (progress > maxVal) progress -= maxVal;
       const percentage = progress / maxVal;
 
+      if (isSoundOn) {
+        if (percentage == splitAt) {
+          playSound(tone1);
+        }
+        if (percentage == 1) {
+          playSound(tone2);
+        }
+      }
+
       if (!isAnalogOn) {
         // Digital
         const knownSvgWidth = 300;
@@ -533,7 +588,7 @@
     }
 
     // ----- Update all handlers -----
-    async function updateAll() {
+    function updateAll() {
       if (isVisible) {
         const now = new Date();
         updateTitle(now);
@@ -565,7 +620,7 @@
                 wakeLock = null;
               });
             } catch (err) {
-              console.error( `Wake Lock Error: ${err.name}, ${err.message}` );
+              __( `Wake Lock Error: ${err.name}, ${err.message}`, 0 );
             }
           }
         } else {
@@ -642,7 +697,7 @@
         } else if (element.webkitRequestFullscreen) {
           element.webkitRequestFullscreen();
         } else {
-          console.error("Fullscreen API not supported");
+          __("Fullscreen API not supported", 0);
         }      
       } else {
         if (document.exitFullscreen) {
@@ -657,7 +712,7 @@
       try {
         localStorage.setItem(key, value);
       } catch (err) {
-        console.error(`localStorage.setItem: ${err.name}, ${err.message}` );
+        __(`localStorage.setItem: ${err.name}, ${err.message}`, 0);
       }
     }
 
@@ -666,68 +721,74 @@
       try {
         ret = localStorage.getItem(key);
       } catch (err) {
-        console.error(`localStorage.setItem: ${err.name}, ${err.message}` );
+        __(`localStorage.setItem: ${err.name}, ${err.message}`, 0);
         return fallback;
       }
-      // console.info('for: ' + key + ', ret = ' + ret);
       if (null === ret) return fallback; // not there, fallback
       return ret;
     }
 
-    function processSettings(settings) {
-      const faceName = settings['faceName'];
+    function processConfig(config) {
+      if (typeof config !== 'object') return;
+
+      const faceName = config['faceName'];
       if (faceName) {
         document.getElementById("face-name").textContent = faceName;
         document.getElementById("face-name-input").value = faceName;
       }
 
-      const wantsAnalogOn = Boolean(settings['isAnalogOn']);
+      const wantsAnalogOn = isTrue(config['isAnalogOn'], false);
       if (wantsAnalogOn) isAnalogOn = true;
 
-      const wantsPomodoroOn = Boolean(settings['isPomodoroOn']);
+      const wantsPomodoroOn = isTrue(config['isPomodoroOn'], false);
       isPomodoroOn = wantsPomodoroOn;
+      setShowClassByClass('sound-span', wantsPomodoroOn);
 
-      const pomodoroWorkFor = Number(settings['pomodoroWorkFor']);
+      const pomodoroWorkFor = Number(config['pomodoroWorkFor']);
       if (!Number.isNaN(pomodoroWorkFor)) pmdrWorkFor = pomodoroWorkFor;
-      const pomodoroRestFor = Number(settings['pomodoroRestFor']);
+      const pomodoroRestFor = Number(config['pomodoroRestFor']);
       if (!Number.isNaN(pomodoroRestFor)) pmdrRestFor = pomodoroRestFor;
     }
 
     // ----- Initialisation code -----
     async function performInit() {
-      // console.info("Performing init");
-      if (!isTrue( clockInitialised = safeGetItem("clockInitialised"), false )) {
-        // console.info("Loading settings");
+      let config = {};
+      config['ping'] = Date.now(); // need this otherwise an empty localStorage causes issues
+      try {
+        if (localStorage) {
+          for (let i = 0; i < localStorage.length; i++) {
+            let key = localStorage.key(i);
+            config[key] = localStorage.getItem(key);
+          }
+        }
+      } catch (err) {
+        __(err, 0);
+      }
+
+      const isInitialised = safeGetItem('clockInitialised', false);
+      __(isInitialised);
+      if (false == isInitialised) {
+        __('Loading config from file');
         fetch("config.json")
           .then(response => {
-            // if (!response.ok) console.info("Settings file not found");
             return response.json();
           })
           .then(settings => {
             // Store each root level setting in localStorage
             Object.keys(settings).forEach(key => {
               safeSetItem(key, settings[key]);
-              // console.info(`Saving ${key} = ${settings[key]}`);
+              config[key] = settings[key];
             });
+            processConfig(config);
             safeSetItem("clockInitialised", true);
-            processSettings(settings);
           })
-          .catch(error => {
-            console.error("Error loading settings: ", error);
+          .catch(err => {
+            __(`Error loading settings: ${err.name} ${err.message}`, 0);
             safeSetItem("clockInitialised", true);
             return error
           });
       } else {
-        let settings = {};
-        try {
-          for (let i = 0; i < localStorage.length; i++) {
-            let key = localStorage.key(i);
-            settings[key] = localStorage.getItem(key);
-          }
-        } catch (err) {
-          console.error(`localStorage: ${err.name}, ${err.message}` );
-        }
-        processSettings(settings);
+        processConfig(config);
       }
       return Promise.resolve();
     }
@@ -740,7 +801,7 @@
         setShowClassById("digital-clock", false);
         setShowClassById("analog-clock", true);
         safeSetItem("isAnalogOn", true);
-        setShowClassById('face-name-input', true);
+        setShowClassByClass('analog-span', true);
         isAnalogOn = true;
       } else {
         document.body.classList.remove("analog");
@@ -748,7 +809,7 @@
         setShowClassById("analog-clock", false);
         setShowClassById("digital-clock", true);
         localStorage.removeItem("isAnalogOn");
-        setShowClassById('face-name-input', false);
+        setShowClassByClass('analog-span', false);
         isAnalogOn = false;
       }
       updateAll();
@@ -807,6 +868,40 @@
       }
     }
 
+    async function loadSound(url) {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const res = await fetch(url); // same-origin fetch is fine
+      if (!res.ok) {
+        __(`loadSound error: HTTP ${res.status}`, 0);
+        return null;
+      }
+
+      const arrayBuf = await res.arrayBuffer();
+
+      let decoded;
+      try {
+        decoded = await audioCtx.decodeAudioData(arrayBuf);
+      } catch {
+        decoded = await new Promise((resolve, reject) =>
+          audioCtx.decodeAudioData(arrayBuf, resolve, reject)
+        );
+      }
+      if (!(decoded instanceof AudioBuffer)) {
+        __('loadSound error: Decoded result is not an AudioBuffer', 0);
+        return null;
+      }
+      return decoded;
+    }
+
+    function playSound(buffer) {
+      if (!(buffer instanceof AudioBuffer) || !audioCtx) return;
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;                 // must be an AudioBuffer
+      src.connect(audioCtx.destination);
+      src.start();                          // start immediately
+      return src;
+    }
+
     /* ============ Core / Main code ============ */
 
     /**
@@ -814,13 +909,18 @@
      */
     document.addEventListener("DOMContentLoaded", function() {
 
+      const params = new URLSearchParams(window.location.search);
+      const debugValue = params.get("debug");
+      if (debugValue !== null) {
+        isDebug = isTrue(debugValue, true);
+      }
+      if (isDebug) __('*** DEBUG ON ***');
+
       performInit();
 
-
-      const params = new URLSearchParams(window.location.search);
       const analogValue = params.get("analog");
       if (analogValue !== null) {
-        isAnalogOn = isTrue(analogValue, false);
+        isAnalogOn = isTrue(analogValue, true);
       }
       if (isAnalogOn) activateAnalog(true); // start the clock works, incl. saving state in localStorage
  
@@ -830,12 +930,10 @@
 
       if ("wakeLock" in navigator) {
         wakeLockSupported = true;
-        // console.info("Screen Wake Lock API is supported");
         visibilityChange(); // first time run
       } else {
-        console.warn("Screen Wake Lock API is not supported on this browser");
+        __("Screen Wake Lock API is not supported on this browser", 1);
       }
-
 
       document.addEventListener("visibilitychange", visibilityChange);
       window.addEventListener("resize", visibilityChange);
@@ -851,7 +949,7 @@
         } else {
           localStorage.removeItem("isPomodoroOn");
         }
-
+        
         if (isPomodoroOn) {
           let now = new Date();
           updatePomodoro(now);
@@ -861,10 +959,29 @@
             setVisibilityById("pa"+i, false);
           }
         }
+
+        setShowClassByClass('sound-span', isPomodoroOn);
       });
 
       document.getElementById("analog-checkbox").addEventListener("change", function() {
         activateAnalog(this.checked);
+      });
+
+      document.getElementById("sound-checkbox").addEventListener("change", async function() {
+        try {
+          if (this.checked) {
+            // user gesture: safe to create/resume and load sounds
+            audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === "suspended") await audioCtx.resume();
+            if (!(tone1 instanceof AudioBuffer)) tone1 = await loadSound("tone1.mp3");
+            if (!(tone2 instanceof AudioBuffer)) tone2 = await loadSound("tone2.mp3");
+          } else {
+            // turn sound off
+            if (audioCtx && audioCtx.state !== "closed") await audioCtx.suspend();
+          }
+        } catch (err) {
+          __(`Sound toggle failed: ${err.name} ${err.message}`, 0);
+        }
       });
 
       document.getElementById("face-name-input").addEventListener("input", function() {
