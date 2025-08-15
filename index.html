@@ -18,7 +18,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="shortcut icon" href="favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <!-- <link rel="icon" type="image/svg+xml" href="favicon.svg"> -->
+  <link rel="icon" type="image/svg+xml" id="favicon">
   <link rel="manifest" href="site.webmanifest">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -225,7 +225,7 @@
     </g>
   </svg>
   <!-- Analog clock -->
-  <svg id="analog-clock" class="hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <svg id="analog-clock" class="hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
     <defs>
       <linearGradient id="g1" x1="100%" y1="0%" x2="0%" y2="0%">
         <stop offset="0%" stop-color="#bbb"/>
@@ -319,6 +319,9 @@
     let audioCtx;
     let tone1 = null;
     let tone2 = null;
+
+    let lastFaviconHour = -1;
+    let lastFaviconMins = -1;
 
     // --- vars as Objects, i.e. getter and setter pair :) ---
 
@@ -621,16 +624,41 @@
       if (title !== document.title) document.title = title;
     }
 
+    // ----- Update the favicon -----
+    function updateFavicon(now) {
+      if (now) {
+        const hours = now.getHours() % 12;
+        const minutes = now.getMinutes();
+        if ((minutes == lastFaviconMins) && (hours == lastFaviconHour)) return; // do nothing
+        if (hours != lastFaviconHour) lastFaviconHour = hours;
+        lastFaviconMins = minutes;
+
+        const svg = 
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" stroke-linecap="round" stroke="#876" stroke-width="7.25">' +
+          '<circle cx="50" cy="50" r="36.5" fill="none"/>' +
+          `<line x1="50" y1="50" x2="${50 + 17.5 * Math.sin(2 * Math.PI * hours / 12)}" y2="${50 - 17.5 * Math.cos(2 * Math.PI * hours / 12)}"/>` +
+          `<line x1="50" y1="50" x2="${50 + 22.5 * Math.sin(2 * Math.PI * minutes / 60)}" y2="${50 - 22.5 * Math.cos(2 * Math.PI * minutes / 60)}"/>` +
+          '</svg>';
+        const encoded = "data:image/svg+xml;base64," + btoa(svg);
+        document.getElementById('favicon').href = encoded;
+      } else if (lastFaviconMins != -1) {
+        document.getElementById('favicon').href = 'favicon.svg';
+        lastFaviconMins = -1;
+      }
+    }
+
     // ----- Update all handlers -----
     function updateAll() {
       if (isVisible) {
         const now = new Date();
-        updateTitle(now);
         updateClock(now);
+        updateTitle(now);
+        updateFavicon(now);
         if (isPomodoroOn) updatePomodoro(now);
       } else {
         if (oGTitle !== document.title) {
           document.title = oGTitle;
+          updateFavicon(false);
         }
       }
     }
