@@ -93,7 +93,7 @@
     /* Digital Clock */
 
     #digital-clock {
-      width: 60%;
+      width: 75%;
       height: auto;
       pointer-events: none;
     }
@@ -280,8 +280,8 @@
   <footer id="footer">&copy; 2017-2025 Silvino R. | 
     <input type="checkbox" id="pomodoro-checkbox"> <label for="pomodoro-checkbox"><u>P</u>omodoro</label>
     <span class="sound-span hide">&raquo;
-      <label class="small" for="work-for-input">Work</label> <input type="number" id="work-for-input" min="1" max="120"> ;
-      <label class="small" for="rest-for-input">Rest</label> <input type="number" id="rest-for-input" min="1" max="120"> ;
+      <label class="small" for="work-for-input">Work</label> <input type="number" id="work-for-input" min="1" max="120"> &middot;
+      <label class="small" for="rest-for-input">Rest</label> <input type="number" id="rest-for-input" min="1" max="120"> &middot;
       <input type="checkbox" id="sound-checkbox"> <label for="sound-checkbox">&#x266B;</label>
     </span>
     |
@@ -839,8 +839,11 @@
 
     // ----- -----
     function handleKeyPress(event) {
+      if (!event) return;
+      const eventKey = event.key.toLowerCase();
+      const isNotTII = !isTypingInInput(event);
 
-      if ((event.key.toLowerCase() === 'p') && (!isTypingInInput(event))) {
+      if ((eventKey === 'p') && isNotTII) {
         const el = document.getElementById('pomodoro-checkbox');
         if (el) {
           el.checked = !el.checked;
@@ -848,7 +851,7 @@
         handlePomodoroSwitchChange(event);
       }
 
-      if ((event.key.toLowerCase() === 'a') && (!isTypingInInput(event))) {
+      if (((eventKey === 'a') || (eventKey === 'd')) && isNotTII) {
         const el = document.getElementById('analog-checkbox');
         if (el) {
           el.checked = !el.checked;
@@ -856,15 +859,13 @@
         handleAnalogChange(event);
       }
 
-      if (isPomodoroOn && (event.key.toLowerCase() === 's') && (!isTypingInInput(event))) {
+      if (isPomodoroOn && (eventKey === 's') && isNotTII) {
         const el = document.getElementById('sound-checkbox');
         if (el) {
           el.checked = !el.checked;
         }
         handleSoundChange(event);
       }
-
-
     }
 
     // ----- -----
