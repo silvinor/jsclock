@@ -4,6 +4,7 @@
  * Copyright (c) 2017-2025 Silvino R.
  * @license MIT
  * @see https://github.com/silvinor/jsclock
+ * Version: 4.2 [2025-08-17]
 -->
 <html lang="en">
 <head>
@@ -317,8 +318,8 @@
     let pmdrRestFor = 5; // default
 
     let audioCtx;
-    let tone1 = null;
-    let tone2 = null;
+    let toneStart = null;
+    let toneEnd = null;
 
     let lastFaviconHour = -1;
     let lastFaviconMins = -1;
@@ -570,10 +571,10 @@
 
       if (isSoundOn) {
         if (Math.round(percentage * 1000) === Math.round(splitAt * 1000)) {
-          playSound(tone1);
+          playSound(toneStart);
         }
         if (percentage == 1) {
-          playSound(tone2);
+          playSound(toneEnd);
         }
       }
 
@@ -700,13 +701,12 @@
 
     // ----- Footer bar visibility handler -----
     function handleFooterVisibility(event) {
-      const footerElement = document.getElementById('footer');
       if (isFooterVisible) {
-        footerElement.classList.remove('show');
+        toggleClassById('footer', false, 'show', 'hide');
         document.body.style.cursor = 'none';
         isFooterVisible = false;
       } else if (isMouseMoving) {
-        footerElement.classList.add('show');
+        toggleClassById('footer', true, 'show', 'hide');
         document.body.style.cursor = 'default';
         isFooterVisible = true;
       }
@@ -773,7 +773,6 @@
 
     // ----- Handle Pomodoro activation -----
     function handlePomodoroSwitchChange(event) {
-      // this.checked is not needed, since `isPomodoroOn` getter will get that
       if (isPomodoroOn) {
         safeSetItem("isPomodoroOn", isPomodoroOn);
       } else {
@@ -802,10 +801,13 @@
 
     // ----- -----
     function handlePomodoroValueChange(event) {
+      const wantedWork = parseInt( getValueById('work-for-input') );
+      const wantedRest = parseInt( getValueById('rest-for-input') );
+
+      if ( (wantedWork <= 0) || (wantedWork > 120) || (wantedRest <= 0) || (wantedRest > 120) ) return;
+
       const savedWork = safeGetItem('pomodoroWorkFor', false);
       const savedRest = safeGetItem('pomodoroRestFor', false);
-      const wantedWork = getValueById('work-for-input');
-      const wantedRest = getValueById('rest-for-input');
 
       if ((savedWork != wantedWork) || (savedRest != wantedRest)) {
         if (wantedWork && (savedWork != wantedWork)) {
@@ -828,35 +830,42 @@
 
     // ----- -----
     async function handleSoundChange(event) {
-      try {
-        if (this.checked) {
-          // user gesture: safe to create/resume and load sounds
-          audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-          if (audioCtx.state === "suspended") await audioCtx.resume();
-          if (!(tone1 instanceof AudioBuffer)) tone1 = await loadSound("tone1.mp3");
-          if (!(tone2 instanceof AudioBuffer)) tone2 = await loadSound("tone2.mp3");
-        } else {
-          // turn sound off
-          if (audioCtx && audioCtx.state !== "closed") await audioCtx.suspend();
+      const el = document.getElementById('sound-checkbox');
+      if (el) {
+        try {
+          if (el.checked) {
+            // user gesture: safe to create/resume and load sounds
+            audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === "suspended") await audioCtx.resume();
+            if (!(toneStart instanceof AudioBuffer)) toneStart = await loadSound("tone_start.mp3");
+            if (!(toneEnd instanceof AudioBuffer)) toneEnd = await loadSound("tone_end.mp3");
+            playSound(toneStart);
+          } else {
+            // turn sound off
+            if (audioCtx && audioCtx.state !== "closed") await audioCtx.suspend();
+          }
+        } catch (err) {
+          __(`Sound toggle failed: ${err.name} ${err.message}`, 0);
         }
-      } catch (err) {
-        __(`Sound toggle failed: ${err.name} ${err.message}`, 0);
       }
     }
 
     // ----- -----
     function handelFaceNameChange(event) {
-      const faceName = this.value;
-      document.getElementById("face-name").textContent = faceName;
-      if (faceName === "") {
-        localStorage.removeItem("faceName");
-      } else {
-        safeSetItem("faceName", faceName);
-      }
+      const el = document.getElementById('face-name-input');
+      if (el) {
+        const faceName = el.value;
+        document.getElementById("face-name").textContent = faceName;
+        if (faceName === "") {
+          localStorage.removeItem("faceName");
+        } else {
+          safeSetItem("faceName", faceName);
+        }
 
-      // fake keep alive
-      handleDebounce();
-      handleMouseMove(null);  
+        // fake keep alive
+        handleDebounce();
+        handleMouseMove(null);
+      }
     }
 
     // ----- -----
@@ -887,6 +896,7 @@
         handleAnalogChange(event);
       }
 
+      // Browser only allows sound if the interaction is a mouse ?? // TODO : fact check?
       if (isPomodoroOn && (eventKey === 's') && isNotTII) {
         const el = document.getElementById('sound-checkbox');
         if (el) {
@@ -1091,12 +1101,17 @@
 
     // ----- -----
     function playSound(buffer) {
-      if (!(buffer instanceof AudioBuffer) || !audioCtx) return;
-      const src = audioCtx.createBufferSource();
-      src.buffer = buffer;                 // must be an AudioBuffer
-      src.connect(audioCtx.destination);
-      src.start();                          // start immediately
-      return src;
+      if (!(buffer instanceof AudioBuffer) || !audioCtx) return false;
+      try {
+        const src = audioCtx.createBufferSource();
+        src.buffer = buffer;                 // must be an AudioBuffer
+        src.connect(audioCtx.destination);
+        src.start();                          // start immediately
+        return src;
+      } catch(err) {
+        __('Cannot play sound', 1);
+        return false;
+      }
     }
 
     /* ============ Core / Main code ============ */
