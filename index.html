@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <!--
  * jsClock - A simple digital clock with pomodoro timer (one page version)
  * Copyright (c) 2017-2025 Silvino R.
@@ -7,1196 +7,1647 @@
  * Version: 4.2 [2025-08-17]
 -->
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-  <title>Clock</title>
-	<meta http-equiv="refresh" content="12960"><!-- refresh every 3.6-hours (200 times per 30 days) -->
-  <meta name="color-scheme" content="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
+    <title>Clock</title>
+    <meta http-equiv="refresh" content="12960" />
+    <!-- refresh every 3.6-hours (200 times per 30 days) -->
+    <meta name="color-scheme" content="dark" />
 
-  <link rel="icon" type="image/gif" href="favicon.gif">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="shortcut icon" href="favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="icon" type="image/svg+xml" id="favicon">
-  <link rel="manifest" href="site.webmanifest">
+    <link rel="icon" type="image/gif" href="favicon.gif" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" id="favicon" />
+    <link rel="manifest" href="site.webmanifest" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/gh/silvinor/bootlace@5.3.8/dist/css/bootlace-reboot.min.css"
+      rel="stylesheet"
+      integrity="sha256-eCBEg8jmYLL5DYXcmFL6mf4va2Z0xPhjmG6iJbKXyA4="
+      crossorigin="anonymous"
+    />
+    <style>
+      :root {
+        color-scheme: dark;
 
-  <style>
-    :root {
-      color-scheme: dark;
+        --font-root: Inter, system-ui, sans-serif;
+        --font-fancy: Raleway, serif;
+        --font-serif: "PT Serif", serif;
 
-      --font-root: Inter, system-ui, sans-serif;
-      --font-fancy: Raleway, serif;
-      --font-serif: "PT Serif", serif;
+        font-family: var(--font-root);
+        font-feature-settings:
+          "liga" 1,
+          "calt" 1; /* fix for Chrome */
+        font-style: normal;
 
-      font-family: var(--font-root);
-      font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
-      font-style: normal;
+        /* Digital */
+        --clock-font: var(--font-fancy);
+        --time-color: #ed0;
+        --seconds-color: #ddd;
+        --ampm-color: #777a;
+        --date-color: #09ca;
 
-      /* Digital */
-      --clock-font: var(--font-fancy);
-      --time-color: #ed0;
-      --seconds-color: #ddd;
-      --ampm-color: #777a;
-      --date-color: #09ca;
+        /* Analog */
+        --anlg-hmrk: #444;
+        --anlg-mmrk: #444;
+        --anlg-hour: #222e;
+        --anlg-mins: #222e;
+        --anlg-secs: #a35e;
+        --anlg-name: #146e;
+        --anlg-time: #333;
+        --anlg-fill: #aaa;
 
-      /* Analog */
-      --anlg-hmrk: #444;
-      --anlg-mmrk: #444;
-      --anlg-hour: #222e;
-      --anlg-mins: #222e;
-      --anlg-secs: #a35e;
-      --anlg-name: #146e;
-      --anlg-time: #333;
-      --anlg-fill: #aaa;
-
-      /* Pomodoro */
-      --pd-inactive-color: #5555;
-      --pd-rest-rem-color: #a35a;
-      --pd-rest-cur-color: #e94a;
-      --pd-work-rem-color: #4d8a;
-      --pd-work-cur-color: #36ba;
-    }
-    @supports (font-variation-settings: normal) {
-      :root { 
-        --font-root: InterVariable, system-ui, sans-serif;
+        /* Pomodoro */
+        --pd-inactive-color: #5555;
+        --pd-rest-rem-color: #a35a;
+        --pd-rest-cur-color: #e94a;
+        --pd-work-rem-color: #4d8a;
+        --pd-work-cur-color: #36ba;
       }
-    }    
-
-    body {
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      /* Stack elements vertically */
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #111;
-      color: #eee;
-      cursor: none;
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-
-    /* Digital Clock */
-
-    #digital-clock {
-      width: 75%;
-      height: auto;
-      pointer-events: none;
-    }
-
-    #time-str .separator { transition: opacity 0.25s ease; }
-    #time-str.odd .separator { opacity: 0.025; }
-    #time-str.even .separator { opacity: 1; }
-
-    /* Analog Clock */
-
-    #analog-clock {
-      width: 66.667%;
-      height: auto;
-      max-height: 66.667%;
-      filter: drop-shadow(0 0 50px rgba(127, 127, 127, 0.5));
-    }
-
-    .hour-marker { stroke: var(--anlg-hmrk); }
-    .minute-marker { stroke: var(--anlg-mmrk); }
-    .hour-hand { stroke: var(--anlg-hour); stroke-width: 3; }
-    .minute-hand { stroke: var(--anlg-mins); stroke-width: 2.25; }
-    .second-hand { stroke: var(--anlg-secs); stroke-width: 1.5; }
-    .face-seconds {
-      font-family: var(--font-serif);
-      font-size: 8px;
-      font-weight: 400;
-    }
-    #face-name {
-      font-family: var(--font-serif);
-      font-size: 10px;
-      font-weight: 900;
-      fill: var(--anlg-name);
-    }
-    #date {
-      opacity: 0.667;
-    }
-    #date #dow-str,
-    #date #day-str,
-    #date #mth-str {
-      font-family: var(--font-serif);
-      font-size: 10px;
-      font-weight: 400;
-    }
-
-    /* Footer */
-
-    #footer {
-      display: block;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      text-align: center;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      color: rgba(221, 221, 221, 0.75); /* #ddd */
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 2s ease-in-out, visibility 2s ease-in-out;
-      z-index: 99;
-    }
-
-    #footer.show {
-      opacity: 1;
-      visibility: visible;
-      display: block;
-    }
-
-    input[type="text"],
-    input[type="number"] {
-      background-color: transparent;
-      border: 1px solid rgba(127, 127, 127, 0.25);
-      color: inherit;
-      font-family: inherit;
-      font-size: 0.75rem;
-      padding: 2px 5px;
-      outline: none;
-      transition: border-color 0.3s ease;
-    }
-    input[type="text"] {
-      width: 8rem;
-    }
-    input[type="number"] {
-      width: 2.25rem;
-    }
-    input::placeholder {
-      color: rgba(127, 127, 127, 0.25);
-    }
-    input:focus {
-      border-bottom-color: rgba(127, 127, 127, 0.5);
-    }
-    label.small {
-      font-size: 0.75rem;
-    }
-    input:focus,
-    textarea:focus,
-    select:focus {
-      box-shadow: 0 0 6px 2px rgba(0, 150, 250, 0.4);
-    }
-
-    body,
-    #digital-clock,
-    #analog-clock,
-    #footer {
-      user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-    }
-
-    .hide { display: none; }
-  </style>
-</head>
-<body class="digital">
-  <!-- Digital clock -->
-  <svg id="digital-clock" class="show" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 120">
-    <defs>
-      <path    id="_0" d="M54.725,23.691 C64.606,23.691 73.423,26.324 81.175,31.591 C88.927,36.857 95.063,44.057 99.583,53.191 C104.103,62.324 106.362,72.757 106.362,84.491 C106.362,96.224 104.103,106.657 99.583,115.791 C95.063,124.924 88.928,132.091 81.178,137.291 C73.428,142.491 64.596,145.091 54.681,145.091 C44.831,145.091 36.015,142.491 28.233,137.291 C20.451,132.091 14.299,124.924 9.78,115.791 C5.26,106.657 3,96.224 3,84.491 C3,72.757 5.26,62.324 9.78,53.191 C14.299,44.057 20.451,36.857 28.233,31.591 C36.015,26.324 44.846,23.691 54.725,23.691 Z M51.641,48.388 C46.757,48.388 42.443,49.908 38.697,52.948 C34.951,55.989 32.032,60.212 29.939,65.617 C27.846,71.022 26.8,77.305 26.8,84.466 C26.8,91.626 27.854,97.898 29.962,103.281 C32.071,108.665 34.99,112.862 38.72,115.875 C42.451,118.888 46.771,120.394 51.681,120.394 C56.458,120.394 60.7,118.883 64.406,115.862 C68.112,112.842 71.017,108.639 73.12,103.253 C75.223,97.868 76.275,91.614 76.275,84.491 C76.275,77.339 75.229,71.056 73.138,65.642 C71.046,60.229 68.147,55.999 64.442,52.955 C60.737,49.91 56.47,48.388 51.641,48.388 Z" />
-      <path    id="_1" d="M97.2,143.091 L97.2,118.972 L71.8,118.972 L71.8,28.891 L44.419,28.891 C43.837,30.051 42.305,31.661 39.822,33.722 C37.339,35.782 34.4,37.901 31.006,40.077 C27.613,42.253 24.209,44.099 20.797,45.616 C17.384,47.132 14.452,47.891 12,47.891 L12,47.891 L12,72.809 C14.615,72.809 17.52,72.354 20.716,71.444 C23.911,70.533 27.094,69.339 30.264,67.859 C33.434,66.38 36.285,64.801 38.819,63.12 C41.352,61.44 43.219,59.8 44.419,58.2 L44.419,58.2 L44.419,118.972 L16.019,118.972 L16.019,143.091 L97.2,143.091 Z" />
-      <path    id="_2" d="M102.394,143.091 L102.394,118.972 L41.447,118.972 C42.907,116.528 44.606,114.355 46.544,112.453 C48.481,110.551 50.711,108.719 53.234,106.958 C55.757,105.196 58.686,103.401 62.02,101.572 C65.355,99.743 69.12,97.782 73.316,95.691 C76.189,94.043 79.188,92.171 82.314,90.075 C85.44,87.979 88.357,85.555 91.066,82.802 C93.774,80.048 95.972,76.873 97.661,73.277 C99.349,69.68 100.194,65.522 100.194,60.803 C100.194,54.082 98.504,48.183 95.123,43.106 C91.743,38.029 86.861,34.057 80.477,31.191 C74.092,28.324 66.346,26.891 57.237,26.891 C51.285,26.891 45.667,27.522 40.383,28.784 C35.098,30.047 30.298,31.64 25.981,33.562 C21.665,35.485 17.923,37.541 14.758,39.728 C11.592,41.916 9.116,43.97 7.328,45.891 L7.328,45.891 L24.191,65.416 C25.884,63.468 27.728,61.594 29.722,59.794 C31.716,57.994 33.877,56.366 36.206,54.909 C38.535,53.453 41.063,52.312 43.789,51.486 C46.515,50.66 49.457,50.247 52.616,50.247 C56.611,50.247 59.97,50.906 62.692,52.225 C65.414,53.544 67.495,55.306 68.934,57.511 C70.374,59.716 71.094,62.172 71.094,64.878 C71.094,67.397 70.373,69.632 68.931,71.583 C67.49,73.534 65.333,75.447 62.461,77.323 C59.589,79.199 56.074,81.228 51.917,83.408 C47.76,85.588 42.959,88.173 37.516,91.162 C31.257,94.533 26.1,98.051 22.044,101.714 C17.988,105.378 14.778,109.282 12.414,113.428 C10.051,117.574 8.391,122.07 7.434,126.917 C6.478,131.764 6,137.155 6,143.091 L6,143.091 L102.394,143.091 Z" />
-      <path    id="_3" d="M51.403,172.491 C61.966,172.491 71.147,170.806 78.948,167.436 C86.749,164.066 92.767,159.311 97.002,153.172 C101.236,147.032 103.353,139.835 103.353,131.581 C103.353,125.375 102.19,119.757 99.862,114.727 C97.535,109.696 94.29,105.518 90.127,102.191 C85.963,98.864 81.075,96.733 75.463,95.8 C80.542,94.867 84.996,92.833 88.827,89.7 C92.657,86.567 95.632,82.685 97.753,78.055 C99.874,73.424 100.934,68.509 100.934,63.309 C100.934,56.17 99.014,49.948 95.173,44.645 C91.333,39.342 85.969,35.224 79.081,32.291 C72.194,29.357 64.219,27.891 55.156,27.891 C48.25,27.891 41.635,28.749 35.311,30.466 C28.987,32.182 23.381,34.557 18.494,37.589 C13.606,40.621 9.781,44.194 7.019,48.306 L7.019,48.306 L23.772,67.172 C26.839,61.993 30.823,58.017 35.725,55.245 C40.627,52.473 46.114,51.087 52.184,51.087 C56.228,51.087 59.747,51.689 62.742,52.891 C65.737,54.093 68.082,55.881 69.778,58.256 C71.474,60.631 72.322,63.618 72.322,67.216 C72.322,72.886 70.041,77.574 65.478,81.278 C60.916,84.982 54.556,86.834 46.4,86.834 L46.4,86.834 L40.169,86.834 L40.169,106.866 L45.819,106.866 C55.837,106.866 63.305,108.734 68.22,112.472 C73.136,116.209 75.594,121.527 75.594,128.425 C75.594,135.008 73.441,139.919 69.136,143.156 C64.831,146.394 58.62,148.012 50.503,148.012 C43.439,148.012 37.483,146.803 32.638,144.384 C27.792,141.966 23.655,138.631 20.228,134.381 L20.228,134.381 L5,153.306 C10.169,159.519 16.661,164.269 24.478,167.558 C32.295,170.846 41.27,172.491 51.403,172.491 Z" />
-      <path    id="_4" d="M88.228,28.891 L88.228,114.631 L105.828,114.631 L105.828,138.75 L88.228,138.75 L88.228,168.491 L61.428,168.491 L61.428,138.75 L3,138.75 L3,114.85 L69.916,28.891 L88.228,28.891 Z M64.4,69.441 L29.859,114.631 L64.4,114.631 L64.4,69.441 Z" />
-      <path    id="_5" d="M51.522,172.891 C61.576,172.891 70.539,170.879 78.409,166.855 C86.28,162.831 92.494,157.207 97.052,149.984 C101.609,142.761 103.888,134.423 103.888,124.969 C103.888,115.975 101.869,108.048 97.833,101.189 C93.796,94.33 88.248,88.952 81.188,85.055 C74.127,81.158 66.106,79.209 57.125,79.209 C52.681,79.209 48.903,79.779 45.789,80.917 C42.676,82.056 40.314,83.467 38.703,85.15 L38.703,85.15 L44.416,53.388 L94.916,53.388 L94.916,28.891 L24.922,28.891 L8.562,113.447 L31.938,113.447 C34.235,109.924 37.283,107.181 41.081,105.219 C44.879,103.256 48.983,102.275 53.394,102.275 C57.804,102.275 61.738,103.241 65.195,105.173 C68.653,107.106 71.387,109.812 73.398,113.294 C75.41,116.775 76.416,120.824 76.416,125.441 C76.416,130.13 75.361,134.285 73.253,137.906 C71.145,141.527 68.247,144.34 64.559,146.345 C60.872,148.351 56.593,149.353 51.722,149.353 C45.724,149.353 39.956,147.802 34.417,144.7 C28.879,141.598 24.212,137.431 20.419,132.2 L20.419,132.2 L5,148.294 C9.315,155.873 15.583,161.867 23.806,166.277 C32.029,170.686 41.268,172.891 51.522,172.891 Z" />
-      <path    id="_6" d="M57.003,-8.527e-14 C65.961,-8.527e-14 74.222,1.963 81.786,5.889 C89.349,9.815 95.716,15.35 100.884,22.494 L100.884,22.494 L85.484,39.319 C82.311,34.315 78.189,30.385 73.117,27.53 C68.045,24.674 62.547,23.247 56.622,23.247 C50.728,23.247 45.563,24.861 41.127,28.089 C36.69,31.317 33.258,35.952 30.83,41.994 C28.402,48.035 27.091,55.359 26.897,63.966 C28.776,60.682 31.179,57.888 34.106,55.583 C37.033,53.278 40.436,51.501 44.314,50.253 C48.192,49.005 52.331,48.381 56.731,48.381 C66.112,48.381 74.533,50.469 81.994,54.645 C89.454,58.821 95.351,64.465 99.684,71.575 C104.018,78.685 106.184,86.707 106.184,95.641 C106.184,104.809 103.906,113.128 99.348,120.597 C94.791,128.066 88.598,134.015 80.77,138.445 C72.942,142.876 64.119,145.091 54.3,145.091 C43.627,145.091 34.379,142.507 26.555,137.339 C18.731,132.171 12.682,124.713 8.409,114.963 C4.136,105.213 2,93.532 2,79.922 C2,62.639 4.245,48.053 8.734,36.164 C13.224,24.276 19.589,15.276 27.83,9.166 C36.07,3.055 45.795,-8.527e-14 57.003,-8.527e-14 Z M54.425,69.616 C49.685,69.616 45.312,70.787 41.306,73.13 C37.3,75.472 34.112,78.607 31.742,82.534 C29.372,86.461 28.188,90.843 28.188,95.678 C28.188,100.457 29.395,104.883 31.811,108.955 C34.227,113.027 37.428,116.286 41.414,118.733 C45.401,121.18 49.722,122.403 54.378,122.403 C59.151,122.403 63.512,121.188 67.461,118.758 C71.41,116.328 74.593,113.068 77.009,108.978 C79.426,104.889 80.634,100.443 80.634,95.641 C80.634,90.855 79.447,86.494 77.072,82.556 C74.697,78.619 71.529,75.478 67.567,73.133 C63.606,70.788 59.225,69.616 54.425,69.616 Z" />
-      <polygon id="_7" points="37.253 168.4 107.75 26.4 1 26.4 1 50.897 65.522 50.897 6.881 168.4" />
-      <path    id="_8" d="M54.622,1.091 C60.016,1.091 65.499,1.936 71.073,3.627 C76.647,5.317 81.773,7.819 86.45,11.133 C91.127,14.446 94.889,18.539 97.736,23.409 C100.583,28.28 102.006,33.896 102.006,40.256 C102.006,44.054 101.186,47.718 99.547,51.247 C97.907,54.776 95.704,57.911 92.936,60.652 C90.168,63.392 87.115,65.569 83.775,67.181 C87.612,69.108 91.249,71.682 94.684,74.902 C98.12,78.121 100.906,81.914 103.042,86.28 C105.179,90.645 106.247,95.581 106.247,101.088 C106.247,109.848 103.902,117.512 99.211,124.08 C94.52,130.647 88.236,135.755 80.359,139.402 C72.482,143.048 63.83,144.872 54.403,144.872 C44.997,144.872 36.395,142.957 28.597,139.127 C20.799,135.296 14.583,130.016 9.95,123.284 C5.317,116.553 3,108.827 3,100.106 C3,94.721 4.138,89.875 6.412,85.569 C8.688,81.263 11.543,77.552 14.978,74.436 C18.414,71.32 21.874,68.902 25.359,67.181 C22.095,65.508 19.096,63.332 16.364,60.652 C13.632,57.971 11.461,54.9 9.852,51.438 C8.242,47.975 7.438,44.345 7.438,40.547 C7.438,34.184 8.861,28.553 11.708,23.653 C14.555,18.753 18.298,14.613 22.939,11.233 C27.58,7.853 32.672,5.317 38.216,3.627 C43.759,1.936 49.228,1.091 54.622,1.091 Z M54.513,78.278 C50.263,78.278 46.29,79.156 42.595,80.912 C38.901,82.669 35.926,85.129 33.67,88.294 C31.415,91.458 30.288,95.209 30.288,99.547 C30.288,102.718 30.981,105.594 32.367,108.175 C33.754,110.756 35.607,112.992 37.928,114.881 C40.249,116.771 42.859,118.195 45.758,119.155 C48.657,120.114 51.648,120.594 54.731,120.594 C58.983,120.594 62.956,119.686 66.65,117.87 C70.344,116.055 73.336,113.546 75.628,110.344 C77.92,107.142 79.066,103.505 79.066,99.434 C79.066,96.07 78.388,93.079 77.033,90.461 C75.678,87.843 73.806,85.623 71.417,83.8 C69.029,81.977 66.385,80.601 63.487,79.672 C60.59,78.743 57.598,78.278 54.513,78.278 Z M54.513,24.828 C50.987,24.828 47.696,25.518 44.639,26.897 C41.582,28.276 39.147,30.193 37.336,32.648 C35.524,35.104 34.619,37.966 34.619,41.234 C34.619,44.88 35.628,47.964 37.645,50.484 C39.663,53.005 42.234,54.904 45.359,56.18 C48.484,57.456 51.572,58.094 54.622,58.094 C57.807,58.094 60.929,57.438 63.986,56.125 C67.043,54.812 69.596,52.896 71.644,50.375 C73.692,47.854 74.716,44.734 74.716,41.016 C74.716,37.745 73.792,34.901 71.944,32.483 C70.096,30.065 67.643,28.185 64.586,26.842 C61.529,25.499 58.171,24.828 54.513,24.828 Z" />
-      <path    id="_9" d="M53.884,28.891 C64.63,28.891 73.897,31.474 81.684,36.642 C89.472,41.81 95.502,49.246 99.775,58.95 C104.048,68.654 106.184,80.357 106.184,94.059 C106.184,111.343 103.94,125.914 99.45,137.773 C94.96,149.633 88.595,158.632 80.355,164.772 C72.114,170.911 62.39,173.981 51.181,173.981 C42.281,173.981 34.035,172.018 26.442,168.092 C18.849,164.166 12.469,158.631 7.3,151.488 L7.3,151.488 L22.7,134.662 C25.873,139.594 30.014,143.505 35.122,146.397 C40.23,149.289 45.71,150.734 51.562,150.734 C57.573,150.734 62.767,149.12 67.144,145.892 C71.521,142.664 74.939,138.014 77.398,131.942 C79.858,125.87 81.154,118.561 81.287,110.016 C79.481,113.166 77.091,115.933 74.116,118.317 C71.141,120.702 67.749,122.511 63.941,123.747 C60.132,124.982 55.97,125.6 51.453,125.6 C42.205,125.6 33.818,123.512 26.291,119.336 C18.764,115.16 12.833,109.502 8.5,102.361 C4.167,95.22 2,87.214 2,78.341 C2,69.155 4.279,60.832 8.836,53.372 C13.393,45.911 19.598,39.966 27.452,35.536 C35.305,31.106 44.116,28.891 53.884,28.891 Z M53.772,51.578 C49.082,51.578 44.742,52.795 40.752,55.23 C36.761,57.664 33.563,60.889 31.158,64.903 C28.753,68.918 27.55,73.397 27.55,78.341 C27.55,83.091 28.738,87.443 31.113,91.398 C33.487,95.354 36.67,98.504 40.661,100.848 C44.652,103.193 49.022,104.366 53.772,104.366 C58.657,104.366 63.062,103.193 66.986,100.848 C70.91,98.504 74.059,95.354 76.434,91.398 C78.809,87.443 79.997,83.091 79.997,78.341 C79.997,73.47 78.794,69.009 76.389,64.958 C73.984,60.907 70.801,57.664 66.841,55.23 C62.88,52.795 58.524,51.578 53.772,51.578 Z" />
-      <path    id="_c" d="M65.906,114.197 L65.906,143.091 L44,143.091 L44,114.197 L65.906,114.197 Z M65.906,39.4 L65.906,68.294 L44,68.294 L44,39.4 L65.906,39.4 Z" />
-      <path    id="_a" d="M52.672,36.441 C67.509,36.441 79.11,40.17 87.475,47.63 C95.84,55.089 100.022,65.78 100.022,79.703 L100.022,79.703 L100.022,113.169 L100.025,113.545 C100.066,116.144 100.544,118.006 101.458,119.133 C102.415,120.313 104.044,121 106.344,121.194 L106.344,121.194 L106.344,143.091 L105.573,143.236 C103.537,143.612 101.662,143.899 99.948,144.097 C98.02,144.32 96.356,144.431 94.956,144.431 C89.619,144.431 85.586,143.253 82.858,140.897 C80.13,138.541 78.452,135.584 77.825,132.028 L77.825,132.028 L77.247,126.691 L76.799,127.26 C72.285,132.91 66.741,137.268 60.167,140.336 C53.374,143.506 46.439,145.091 39.359,145.091 C32.426,145.091 26.196,143.642 20.669,140.745 C15.142,137.848 10.815,133.907 7.689,128.92 C4.563,123.934 3,118.35 3,112.169 C3,105.323 4.915,99.346 8.744,94.239 C12.573,89.132 17.866,85.154 24.623,82.306 C31.381,79.458 39.159,78.034 47.959,78.034 C52.386,78.034 56.854,78.386 61.362,79.091 C65.871,79.795 69.824,80.85 73.222,82.256 L73.222,82.256 L73.222,76.641 L73.218,76.147 C73.122,69.769 71.16,64.821 67.33,61.303 C63.402,57.695 57.579,55.891 49.862,55.891 C44.069,55.891 38.568,56.894 33.361,58.9 C28.154,60.906 22.677,63.812 16.931,67.619 L16.931,67.619 L8.456,50.169 L9.288,49.622 C15.944,45.289 22.753,42.032 29.714,39.85 C36.965,37.577 44.618,36.441 52.672,36.441 Z M52.144,93.584 C45.194,93.584 39.493,95.066 35.042,98.028 C30.591,100.991 28.366,104.936 28.366,109.866 C28.366,112.539 29.101,115.081 30.57,117.492 C32.04,119.904 34.166,121.854 36.947,123.344 C39.728,124.833 43.087,125.578 47.025,125.578 C51.05,125.578 54.973,124.809 58.794,123.27 C62.615,121.732 65.721,119.776 68.112,117.403 C69.652,115.899 70.889,114.33 71.822,112.697 C72.755,111.064 73.222,109.58 73.222,108.247 L73.222,108.247 L73.222,97.594 L72.409,97.289 C69.409,96.193 66.204,95.316 62.792,94.659 C59.07,93.943 55.521,93.584 52.144,93.584 Z" />
-      <path    id="_p" d="M59.644,36.441 C66.783,36.441 73.323,37.847 79.263,40.659 C85.202,43.472 90.372,47.382 94.772,52.389 C99.172,57.396 102.59,63.148 105.027,69.644 C107.463,76.14 108.681,83.102 108.681,90.531 C108.681,100.698 106.73,109.915 102.827,118.181 C98.923,126.448 93.514,132.999 86.598,137.836 C79.683,142.672 71.745,145.091 62.784,145.091 C54.672,145.091 47.523,143.243 41.337,139.547 C35.152,135.851 30.306,130.918 26.8,124.747 L26.8,124.747 L26.8,185.691 L0,185.691 L0,38.331 L23.447,38.331 L23.447,56.216 L23.833,55.629 C27.728,49.806 32.654,45.181 38.611,41.753 C44.766,38.211 51.777,36.441 59.644,36.441 Z M52.266,59.216 C49.728,59.216 47.15,59.651 44.531,60.52 C41.913,61.39 39.431,62.624 37.086,64.222 C34.741,65.82 32.668,67.688 30.866,69.827 C29.064,71.965 27.708,74.334 26.8,76.934 L26.8,76.934 L26.8,101.503 L27.095,102.183 C28.7,105.786 30.803,109.077 33.403,112.053 C36.166,115.216 39.326,117.717 42.883,119.556 C46.44,121.396 50.101,122.316 53.866,122.316 C57.984,122.316 61.723,121.441 65.081,119.692 C68.44,117.943 71.333,115.581 73.761,112.605 C76.189,109.629 78.053,106.228 79.353,102.403 C80.653,98.578 81.303,94.591 81.303,90.441 C81.303,86.082 80.583,82.021 79.144,78.256 C77.704,74.492 75.667,71.185 73.031,68.336 C70.396,65.487 67.318,63.255 63.797,61.639 C60.276,60.023 56.432,59.216 52.266,59.216 Z" />
-      <path    id="_m" d="M17.879,143.091 L17.879,81.894 C19.24,75.371 21.504,70.106 24.672,66.098 C27.839,62.091 31.134,60.087 34.556,60.087 C37.978,60.087 40.635,62.022 42.526,65.892 C44.418,69.762 45.364,75.908 45.364,84.331 L45.364,84.331 L45.364,143.091 L63.243,143.091 L63.243,82.003 C64.604,75.555 66.856,70.291 69.998,66.209 C73.141,62.128 76.448,60.087 79.92,60.087 C83.342,60.087 86.011,62.041 87.927,65.948 C89.843,69.856 90.801,75.983 90.801,84.331 L90.801,84.331 L90.801,143.091 L108.68,143.091 L108.68,77.625 C108.68,72.56 108.384,67.587 107.793,62.705 C107.202,57.822 106.155,53.399 104.654,49.436 C103.153,45.472 101.036,42.316 98.303,39.966 C95.57,37.616 92.061,36.441 87.778,36.441 C82.205,36.441 77.216,38.352 72.808,42.173 C68.401,45.995 64.781,51.469 61.949,58.594 C61.067,52.39 59.012,47.146 55.784,42.864 C52.555,38.582 48.05,36.441 42.268,36.441 C36.455,36.441 31.321,38.27 26.864,41.928 C22.407,45.586 18.836,50.831 16.151,57.663 L16.151,57.663 L16.151,38.331 L0,38.331 L0,143.091 L17.879,143.091 Z" />
-    </defs>
-    <g id="clock">
-      <g id="time-str" fill="var(--time-color)">
-        <use id="__0" transform="                 scale(0.475, 0.4875)" xlink:href="#_0"/>
-        <use id="__1" transform="translate(55,0)  scale(0.475, 0.4875)" xlink:href="#_0"/>
-        <use id="__2" transform="translate(95,0)  scale(0.475, 0.4875)" xlink:href="#_c" class="separator"/>
-        <use id="__3" transform="translate(135,0) scale(0.475, 0.4875)" xlink:href="#_0"/>
-        <use id="__4" transform="translate(190,0) scale(0.475, 0.4875)" xlink:href="#_0"/>
-      </g>
-      <g fill="var(--seconds-color)">
-        <use id="__6" transform="translate(245,0)   scale(0.2375, 0.25)" xlink:href="#_0"/>
-        <use id="__7" transform="translate(272.5,0) scale(0.2375, 0.25)" xlink:href="#_0"/>
-      </g>
-      <g fill="var(--ampm-color)">
-        <use id="__8" transform="translate(245,45)  scale(0.175, 0.20)" xlink:href="#_p"/>
-        <use id="__9" transform="translate(268,45)  scale(0.275, 0.20)" xlink:href="#_m"/>
-      </g>
-    </g>
-    <g font-family="inherit">
-      <text id="date-str" x="0" y="108" font-size="32" fill="var(--date-color)" font-weight="400" textLength="300" lengthAdjust="spacingAndGlyphs">If you see this, it's broken!</text>
-    </g>
-    <g id="pomodoro" stroke="none">
-      <rect id="pd5" x="200" y="118" width="100" height="2" fill="var(--pd-inactive-color)" visibility="hidden"/>
-      <rect id="pd4" x="150" y="118" width="50" height="2" fill="var(--pd-rest-rem-color)" visibility="hidden"/>
-      <rect id="pd3" x="100" y="118" width="50" height="2" fill="var(--pd-rest-cur-color)" visibility="hidden"/>
-      <rect id="pd2" x="50" y="118" width="50" height="2" fill="var(--pd-work-rem-color)" visibility="hidden"/>
-      <rect id="pd1" x="0" y="118" width="50" height="2" fill="var(--pd-work-cur-color)" visibility="hidden"/>
-    </g>
-  </svg>
-  <!-- Analog clock -->
-  <svg id="analog-clock" class="hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-    <defs>
-      <linearGradient id="g1" x1="100%" y1="0%" x2="0%" y2="0%">
-        <stop offset="0%" stop-color="#bbb"/>
-        <stop offset="100%" stop-color="#eee"/>
-      </linearGradient>
-      <radialGradient id="g2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-        <stop offset="0%" stop-color="#eee"/>
-        <stop offset="100%" stop-color="#bbb"/>
-      </radialGradient>
-      <linearGradient id="g3" x1="100%" y1="0%" x2="0%" y2="0%">
-        <stop offset="0%" stop-color="#ddd"/>
-        <stop offset="100%" stop-color="#ccc"/>
-      </linearGradient>
-    </defs>
-    <g id="clock-face">
-      <circle cx="100" cy="100" r="100" stroke="none" fill="url(#g1)"/>
-      <circle cx="100" cy="100" r="80" stroke="none" fill="url(#g2)"/>
-      <text id="face-name" x="100" y="60" text-anchor="middle" dominant-baseline="middle"></text>
-      <circle id="face-ring" cx="100" cy="100" r="99" stroke-width="2" stroke="var(--anlg-name)" fill="none"/>
-    </g>
-    <g id="pomodoro" fill="none" stroke-width="2.5" stroke-linecap="butt">
-      <path id="pa5" visibility="hidden" stroke="var(--pd-inactive-color)"/>
-      <path id="pa4" visibility="hidden" stroke="var(--pd-rest-rem-color)"/>
-      <path id="pa3" visibility="hidden" stroke="var(--pd-rest-cur-color)"/>
-      <path id="pa2" visibility="hidden" stroke="var(--pd-work-rem-color)"/>
-      <path id="pa1" visibility="hidden" stroke="var(--pd-work-cur-color)"/>
-    </g>    
-    <g id="markers" stroke-linecap="round"></g>
-    <g id="date">
-      <g stroke="#aaa" stroke-width="0.2">
-        <rect x="120" y="94" width="20" height="12" rx="2" ry="2" fill="url(#g3)"/>
-        <rect x="140" y="94" width="15" height="12" rx="2" ry="2" fill="url(#g3)"/>
-        <rect x="155" y="94" width="20" height="12" rx="2" ry="2" fill="url(#g3)"/>
-      </g>
-      <g stroke="var(--anlg-time)" stroke-width="0.3" fill="var(--anlg-fill)">
-        <text id="dow-str"   x="130" y="101" textLength="16" text-anchor="middle" dominant-baseline="middle" lengthAdjust="spacingAndGlyphs"></text>
-        <text id="day-str"   x="147.5" y="101" textLength="11" text-anchor="middle" dominant-baseline="middle" lengthAdjust="spacingAndGlyphs"></text>
-        <text id="mth-str" x="165" y="101" textLength="16" text-anchor="middle" dominant-baseline="middle" lengthAdjust="spacingAndGlyphs"></text>
-      </g>
-    </g>
-    <g id="hands" stroke-linecap="round">
-      <line id="hour-hand"     x1="100" y1="93" x2="100" y2="40" class="hour-hand"/>
-      <line id="hour-hand-2"   x1="100" y1="93" x2="100" y2="87" class="hour-hand"/>
-      <line id="minute-hand"   x1="100" y1="93" x2="100" y2="5"  class="minute-hand"/>
-      <line id="minute-hand-2" x1="100" y1="93" x2="100" y2="85"  class="minute-hand"/>
-      <line id="second-hand"   x1="100" y1="93" x2="100" y2="12" class="second-hand"/>
-      <line id="second-hand-2" x1="100" y1="93" x2="100" y2="83" class="second-hand"/>
-      <circle cx="100" cy="100" r="7" fill="url(#g3)" stroke="#aaa" stroke-width="0.2"/>
-    </g>
-  </svg>
-  <!-- Footer -->
-  <footer id="footer">&copy; 2017-2025 Silvino R. | 
-    <input type="checkbox" id="pomodoro-checkbox"> <label for="pomodoro-checkbox"><u>P</u>omodoro</label>
-    <span class="sound-span hide">&raquo;
-      <label class="small" for="work-for-input">Work</label> <input type="number" id="work-for-input" min="1" max="120"> &middot;
-      <label class="small" for="rest-for-input">Rest</label> <input type="number" id="rest-for-input" min="1" max="120"> &middot;
-      <input type="checkbox" id="sound-checkbox"> <label for="sound-checkbox">&#x266B;</label>
-    </span>
-    |
-    <span id="analog-span" class="show"><input type="checkbox" id="analog-checkbox"> <label for="analog-checkbox"><u>A</u>nalog</label></span>
-    <span class="analog-span hide">&raquo; <input type="text" maxlength="25" id="face-name-input" placeholder="Face Name"></span>
-  </footer>
-  
-  <script>
-    const months = new Array(
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December' );
-    const days = new Array(
-      'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' );
-    const CLOCK_REFRESH = 1000;
-    const FOOTER_SHOW_DURATION = 1000;
-    const FOOTER_HIDE_DURATION = 5000;
-    const DEBOUNCE_POLL_RATE = 200; // 25 minutes
-
-    let isVisible = true;
-    let isDebug = false;
-    const oGTitle = document.title;
-    var wakeLockSupported = false;
-    let wakeLock = null;
-    let clockInterval = null;
-
-    var lastMousePosition = { x: null, y: null };
-    var debounceTimeout = null;
-    var isMouseMoving = false;
-    var footerTimeout = null;
-    var isFooterVisible = false;
-
-    let pmdrWorkFor = 25; // default
-    let pmdrRestFor = 5; // default
-
-    let audioCtx;
-    let toneStart = null;
-    let toneEnd = null;
-
-    let lastFaviconHour = -1;
-    let lastFaviconMins = -1;
-
-    // --- vars as Objects, i.e. getter and setter pair :) ---
-
-    const analogCheckbox = document.getElementById("analog-checkbox");
-    Object.defineProperty(window, "isAnalogOn", {
-      get() { return analogCheckbox.checked; },
-      set(value) { analogCheckbox.checked = Boolean(value); }
-    });
-
-    const pomodoroCheckbox = document.getElementById("pomodoro-checkbox");
-    Object.defineProperty(window, "isPomodoroOn", {
-      get() { return pomodoroCheckbox.checked; },
-      set(value) { pomodoroCheckbox.checked = Boolean(value); }
-    });
-
-    const soundCheckbox = document.getElementById("sound-checkbox");
-    Object.defineProperty(window, "isSoundOn", {
-      get() { return soundCheckbox.checked; },
-      set(value) { soundCheckbox.checked = Boolean(value); }
-    });
-
-    /* ------------ Helpers ------------ */
-
-    function __(msg, level = 3) {
-      // Level: 0 = error, 1 = warn, 2 = info, >=3 = log
-      if (level <= 0) {
-        console.error(msg);
-      } else if (level == 1) {
-        console.warn(msg);
-      } else if (isDebug) {
-        if (level == 2) {
-          console.info(msg);
-        } else {
-          console.log(msg);
+      @supports (font-variation-settings: normal) {
+        :root {
+          --font-root: InterVariable, system-ui, sans-serif;
         }
       }
-    }
 
-    // ----- Truthy function -----
-    function isTrue(value, fallback = true) {
-      if (typeof value === "boolean") return value;
-      if (value === undefined || value === null || value === '') return fallback;
-      if (typeof value === "string") {
-        value = value.trim().toLowerCase();
-        if (value.length > 0) value = value[0];
+      body {
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        /* Stack elements vertically */
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        max-height: 100vh;
+        background-color: #111;
+        color: #eee;
+        cursor: none;
       }
-      const trueValues = ["t", "y", "1", 1];
-      if (trueValues.includes(value)) return true;
-      const falseValues = ["0", 0, "n", "f"];
-      if (falseValues.includes(value)) return false;
-      if (typeof value === "number") return value !== 0;
-      return fallback;
-    }
 
-    // // ----- Checkbox, by Id, get if checked -----
-    // function getCheckboxCheckedById(checkboxId) {
-    //   const checkbox = document.getElementById(checkboxId);
-    //   if (checkbox && checkbox.type === 'checkbox') return checkbox.checked;
-    //   return false;
-    // }
-
-    // ----- Set content by Id -----
-    function setContentById(elementId, newValue) {
-      const element = document.getElementById(elementId);
-      if (element && newValue !== element.textContent) element.textContent = newValue;
-    }
-
-    // ----- Update SVG Clock -----
-    function updateClock(now) {
-      var hours = now.getHours();
-      const tHourStr = (hours < 12) ? "am" : "pm";
-      if (hours > 12) hours -= 12;
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
-      const month = now.getMonth();
-      const day = now.getDate();
-      const weekday = now.getDay();
-
-      if (!isAnalogOn) {
-        // Digital
-
-        const hourStr = String(hours).padStart(2, '0');
-        const minsStr = String(minutes).padStart(2, '0');
-        const secsStr = String(seconds).padStart(2, '0');
-
-        setAttributeById("__0", "xlink:href", `#_${hourStr[0]}`);
-        setAttributeById("__1", "xlink:href", `#_${hourStr[1]}`);
-        setAttributeById("__3", "xlink:href", `#_${minsStr[0]}`);
-        setAttributeById("__4", "xlink:href", `#_${minsStr[1]}`);
-        setAttributeById("__6", "xlink:href", `#_${secsStr[0]}`);
-        setAttributeById("__7", "xlink:href", `#_${secsStr[1]}`);
-
-        toggleClassById("time-str", (seconds % 2 === 0), 'even', 'odd');
-
-        setAttributeById("__8", "xlink:href", `#_${tHourStr[0]}`);
-
-        const year = now.getFullYear();
-        const fullDateStr = days[weekday] + ", " + day + " " + months[month] + " " + year;
-        setContentById("date-str", fullDateStr);
-
-      } else {
-        // Analog
-
-        const hourAngle = ((hours % 12) * 30) + (minutes * 0.5);
-        const minuteAngle = (minutes * 6) + (seconds * 0.1);
-        const secondAngle = seconds * 6;
-
-        transformRotateById("hour-hand", hourAngle);
-        transformRotateById("hour-hand-2", hourAngle + 180);
-        transformRotateById("minute-hand", minuteAngle);
-        transformRotateById("minute-hand-2", minuteAngle + 180);
-        transformRotateById("second-hand", secondAngle);
-        transformRotateById("second-hand-2", secondAngle + 180);
-
-        const monthStr = months[month].substring(0, 3).toUpperCase();
-        const weekdayStr = days[weekday].substring(0, 3).toUpperCase();
-
-        setContentById("dow-str", weekdayStr);
-        setContentById("day-str", day);
-        setContentById("mth-str", monthStr);
-
+      a {
+        color: inherit;
+        text-decoration: none;
       }
-    }
-
-    // ----- Transform rotate by Id -----
-    function transformRotateById(id, angle) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.setAttribute("transform", `rotate(${angle} 100 100)`);
+      a:hover {
+        text-decoration: underline;
       }
-    }
 
-    // ----- -----
-    function setAttributeById(id, attribute, value) {
-      const el = document.getElementById(id);
-      if (el) {
-        el.setAttribute(attribute, value);
+      /* Digital Clock */
+
+      #digital-clock {
+        width: 75%;
+        height: auto;
+        pointer-events: none;
       }
-    }
 
-    // ----- ----
-    function getAttributeById(id, attr) {
-      const el = document.getElementById(id);
-      if (el) {
-        return el.getAttribute(attr);
+      #time-str .separator {
+        transition: opacity 0.25s ease;
       }
-      return false;
-    }
-
-    // ----- Set visibility by Id, html visibility attribute -----
-    function setVisibilityById(id, visible = true) {
-      let value = visible ? "visible" : "hidden";
-      setAttributeById(id, 'visibility', value);
-    }
-
-    // ----- Toggle class names -----
-    function toggleClassById(id, first, class1, class2) {
-      let el = document.getElementById(id);
-      if (el) {
-        if (first) {
-          el.classList.remove(class2);
-          el.classList.add(class1);
-        } else {
-          el.classList.remove(class1);
-          el.classList.add(class2);
-        }
+      #time-str.odd .separator {
+        opacity: 0.025;
       }
-    }
+      #time-str.even .separator {
+        opacity: 1;
+      }
 
-    // ----- Set visibility by Id, with .show and .hide classes -----
-    function setShowClassById(id, visible = true) {
-      toggleClassById(id, visible, 'show', 'hide');
-    }
+      /* Analog Clock */
 
-    // ----- -----
-    function toggleClassByClass(classN, first, class1, class2) {
-      const nodes = document.querySelectorAll(`.${classN}`);
-      nodes.forEach(el => {
-        if (first) {
-          el.classList.remove(class2);
-          el.classList.add(class1);
-        } else {
-          el.classList.remove(class1);
-          el.classList.add(class2);
-        }
+      #analog-clock {
+        width: 66.667%;
+        height: auto;
+        max-height: 66.667%;
+        filter: drop-shadow(0 0 50px rgba(127, 127, 127, 0.5));
+      }
+
+      .hour-marker {
+        stroke: var(--anlg-hmrk);
+      }
+      .minute-marker {
+        stroke: var(--anlg-mmrk);
+      }
+      .hour-hand {
+        stroke: var(--anlg-hour);
+        stroke-width: 3;
+      }
+      .minute-hand {
+        stroke: var(--anlg-mins);
+        stroke-width: 2.25;
+      }
+      .second-hand {
+        stroke: var(--anlg-secs);
+        stroke-width: 1.5;
+      }
+      .face-seconds {
+        font-family: var(--font-serif);
+        font-size: 8px;
+        font-weight: 400;
+      }
+      #face-name {
+        font-family: var(--font-serif);
+        font-size: 10px;
+        font-weight: 900;
+        fill: var(--anlg-name);
+      }
+      #date {
+        opacity: 0.667;
+      }
+      #date #dow-str,
+      #date #day-str,
+      #date #mth-str {
+        font-family: var(--font-serif);
+        font-size: 10px;
+        font-weight: 400;
+      }
+
+      /* Footer */
+
+      #footer {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(221, 221, 221, 0.75); /* #ddd */
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 2s ease-in-out,
+          visibility 2s ease-in-out;
+        z-index: 99;
+      }
+
+      #footer.show {
+        opacity: 1;
+        visibility: visible;
+        display: block;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        background-color: transparent;
+        border: 1px solid rgba(127, 127, 127, 0.25);
+        color: inherit;
+        font-family: inherit;
+        font-size: 0.75rem;
+        padding: 2px 5px;
+        outline: none;
+        transition: border-color 0.3s ease;
+      }
+      input[type="text"] {
+        width: 8rem;
+      }
+      input[type="number"] {
+        width: 2.25rem;
+      }
+      input::placeholder {
+        color: rgba(127, 127, 127, 0.25);
+      }
+      input:focus {
+        border-bottom-color: rgba(127, 127, 127, 0.5);
+      }
+      label.small {
+        font-size: 0.75rem;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        box-shadow: 0 0 6px 2px rgba(0, 150, 250, 0.4);
+      }
+
+      body,
+      #digital-clock,
+      #analog-clock,
+      #footer {
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+      }
+
+      .hide {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="digital">
+    <!-- Digital clock -->
+    <svg
+      id="digital-clock"
+      class="show"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 300 120"
+    >
+      <defs>
+        <path
+          id="_0"
+          d="M54.725,23.691 C64.606,23.691 73.423,26.324 81.175,31.591 C88.927,36.857 95.063,44.057 99.583,53.191 C104.103,62.324 106.362,72.757 106.362,84.491 C106.362,96.224 104.103,106.657 99.583,115.791 C95.063,124.924 88.928,132.091 81.178,137.291 C73.428,142.491 64.596,145.091 54.681,145.091 C44.831,145.091 36.015,142.491 28.233,137.291 C20.451,132.091 14.299,124.924 9.78,115.791 C5.26,106.657 3,96.224 3,84.491 C3,72.757 5.26,62.324 9.78,53.191 C14.299,44.057 20.451,36.857 28.233,31.591 C36.015,26.324 44.846,23.691 54.725,23.691 Z M51.641,48.388 C46.757,48.388 42.443,49.908 38.697,52.948 C34.951,55.989 32.032,60.212 29.939,65.617 C27.846,71.022 26.8,77.305 26.8,84.466 C26.8,91.626 27.854,97.898 29.962,103.281 C32.071,108.665 34.99,112.862 38.72,115.875 C42.451,118.888 46.771,120.394 51.681,120.394 C56.458,120.394 60.7,118.883 64.406,115.862 C68.112,112.842 71.017,108.639 73.12,103.253 C75.223,97.868 76.275,91.614 76.275,84.491 C76.275,77.339 75.229,71.056 73.138,65.642 C71.046,60.229 68.147,55.999 64.442,52.955 C60.737,49.91 56.47,48.388 51.641,48.388 Z"
+        />
+        <path
+          id="_1"
+          d="M97.2,143.091 L97.2,118.972 L71.8,118.972 L71.8,28.891 L44.419,28.891 C43.837,30.051 42.305,31.661 39.822,33.722 C37.339,35.782 34.4,37.901 31.006,40.077 C27.613,42.253 24.209,44.099 20.797,45.616 C17.384,47.132 14.452,47.891 12,47.891 L12,47.891 L12,72.809 C14.615,72.809 17.52,72.354 20.716,71.444 C23.911,70.533 27.094,69.339 30.264,67.859 C33.434,66.38 36.285,64.801 38.819,63.12 C41.352,61.44 43.219,59.8 44.419,58.2 L44.419,58.2 L44.419,118.972 L16.019,118.972 L16.019,143.091 L97.2,143.091 Z"
+        />
+        <path
+          id="_2"
+          d="M102.394,143.091 L102.394,118.972 L41.447,118.972 C42.907,116.528 44.606,114.355 46.544,112.453 C48.481,110.551 50.711,108.719 53.234,106.958 C55.757,105.196 58.686,103.401 62.02,101.572 C65.355,99.743 69.12,97.782 73.316,95.691 C76.189,94.043 79.188,92.171 82.314,90.075 C85.44,87.979 88.357,85.555 91.066,82.802 C93.774,80.048 95.972,76.873 97.661,73.277 C99.349,69.68 100.194,65.522 100.194,60.803 C100.194,54.082 98.504,48.183 95.123,43.106 C91.743,38.029 86.861,34.057 80.477,31.191 C74.092,28.324 66.346,26.891 57.237,26.891 C51.285,26.891 45.667,27.522 40.383,28.784 C35.098,30.047 30.298,31.64 25.981,33.562 C21.665,35.485 17.923,37.541 14.758,39.728 C11.592,41.916 9.116,43.97 7.328,45.891 L7.328,45.891 L24.191,65.416 C25.884,63.468 27.728,61.594 29.722,59.794 C31.716,57.994 33.877,56.366 36.206,54.909 C38.535,53.453 41.063,52.312 43.789,51.486 C46.515,50.66 49.457,50.247 52.616,50.247 C56.611,50.247 59.97,50.906 62.692,52.225 C65.414,53.544 67.495,55.306 68.934,57.511 C70.374,59.716 71.094,62.172 71.094,64.878 C71.094,67.397 70.373,69.632 68.931,71.583 C67.49,73.534 65.333,75.447 62.461,77.323 C59.589,79.199 56.074,81.228 51.917,83.408 C47.76,85.588 42.959,88.173 37.516,91.162 C31.257,94.533 26.1,98.051 22.044,101.714 C17.988,105.378 14.778,109.282 12.414,113.428 C10.051,117.574 8.391,122.07 7.434,126.917 C6.478,131.764 6,137.155 6,143.091 L6,143.091 L102.394,143.091 Z"
+        />
+        <path
+          id="_3"
+          d="M51.403,172.491 C61.966,172.491 71.147,170.806 78.948,167.436 C86.749,164.066 92.767,159.311 97.002,153.172 C101.236,147.032 103.353,139.835 103.353,131.581 C103.353,125.375 102.19,119.757 99.862,114.727 C97.535,109.696 94.29,105.518 90.127,102.191 C85.963,98.864 81.075,96.733 75.463,95.8 C80.542,94.867 84.996,92.833 88.827,89.7 C92.657,86.567 95.632,82.685 97.753,78.055 C99.874,73.424 100.934,68.509 100.934,63.309 C100.934,56.17 99.014,49.948 95.173,44.645 C91.333,39.342 85.969,35.224 79.081,32.291 C72.194,29.357 64.219,27.891 55.156,27.891 C48.25,27.891 41.635,28.749 35.311,30.466 C28.987,32.182 23.381,34.557 18.494,37.589 C13.606,40.621 9.781,44.194 7.019,48.306 L7.019,48.306 L23.772,67.172 C26.839,61.993 30.823,58.017 35.725,55.245 C40.627,52.473 46.114,51.087 52.184,51.087 C56.228,51.087 59.747,51.689 62.742,52.891 C65.737,54.093 68.082,55.881 69.778,58.256 C71.474,60.631 72.322,63.618 72.322,67.216 C72.322,72.886 70.041,77.574 65.478,81.278 C60.916,84.982 54.556,86.834 46.4,86.834 L46.4,86.834 L40.169,86.834 L40.169,106.866 L45.819,106.866 C55.837,106.866 63.305,108.734 68.22,112.472 C73.136,116.209 75.594,121.527 75.594,128.425 C75.594,135.008 73.441,139.919 69.136,143.156 C64.831,146.394 58.62,148.012 50.503,148.012 C43.439,148.012 37.483,146.803 32.638,144.384 C27.792,141.966 23.655,138.631 20.228,134.381 L20.228,134.381 L5,153.306 C10.169,159.519 16.661,164.269 24.478,167.558 C32.295,170.846 41.27,172.491 51.403,172.491 Z"
+        />
+        <path
+          id="_4"
+          d="M88.228,28.891 L88.228,114.631 L105.828,114.631 L105.828,138.75 L88.228,138.75 L88.228,168.491 L61.428,168.491 L61.428,138.75 L3,138.75 L3,114.85 L69.916,28.891 L88.228,28.891 Z M64.4,69.441 L29.859,114.631 L64.4,114.631 L64.4,69.441 Z"
+        />
+        <path
+          id="_5"
+          d="M51.522,172.891 C61.576,172.891 70.539,170.879 78.409,166.855 C86.28,162.831 92.494,157.207 97.052,149.984 C101.609,142.761 103.888,134.423 103.888,124.969 C103.888,115.975 101.869,108.048 97.833,101.189 C93.796,94.33 88.248,88.952 81.188,85.055 C74.127,81.158 66.106,79.209 57.125,79.209 C52.681,79.209 48.903,79.779 45.789,80.917 C42.676,82.056 40.314,83.467 38.703,85.15 L38.703,85.15 L44.416,53.388 L94.916,53.388 L94.916,28.891 L24.922,28.891 L8.562,113.447 L31.938,113.447 C34.235,109.924 37.283,107.181 41.081,105.219 C44.879,103.256 48.983,102.275 53.394,102.275 C57.804,102.275 61.738,103.241 65.195,105.173 C68.653,107.106 71.387,109.812 73.398,113.294 C75.41,116.775 76.416,120.824 76.416,125.441 C76.416,130.13 75.361,134.285 73.253,137.906 C71.145,141.527 68.247,144.34 64.559,146.345 C60.872,148.351 56.593,149.353 51.722,149.353 C45.724,149.353 39.956,147.802 34.417,144.7 C28.879,141.598 24.212,137.431 20.419,132.2 L20.419,132.2 L5,148.294 C9.315,155.873 15.583,161.867 23.806,166.277 C32.029,170.686 41.268,172.891 51.522,172.891 Z"
+        />
+        <path
+          id="_6"
+          d="M57.003,-8.527e-14 C65.961,-8.527e-14 74.222,1.963 81.786,5.889 C89.349,9.815 95.716,15.35 100.884,22.494 L100.884,22.494 L85.484,39.319 C82.311,34.315 78.189,30.385 73.117,27.53 C68.045,24.674 62.547,23.247 56.622,23.247 C50.728,23.247 45.563,24.861 41.127,28.089 C36.69,31.317 33.258,35.952 30.83,41.994 C28.402,48.035 27.091,55.359 26.897,63.966 C28.776,60.682 31.179,57.888 34.106,55.583 C37.033,53.278 40.436,51.501 44.314,50.253 C48.192,49.005 52.331,48.381 56.731,48.381 C66.112,48.381 74.533,50.469 81.994,54.645 C89.454,58.821 95.351,64.465 99.684,71.575 C104.018,78.685 106.184,86.707 106.184,95.641 C106.184,104.809 103.906,113.128 99.348,120.597 C94.791,128.066 88.598,134.015 80.77,138.445 C72.942,142.876 64.119,145.091 54.3,145.091 C43.627,145.091 34.379,142.507 26.555,137.339 C18.731,132.171 12.682,124.713 8.409,114.963 C4.136,105.213 2,93.532 2,79.922 C2,62.639 4.245,48.053 8.734,36.164 C13.224,24.276 19.589,15.276 27.83,9.166 C36.07,3.055 45.795,-8.527e-14 57.003,-8.527e-14 Z M54.425,69.616 C49.685,69.616 45.312,70.787 41.306,73.13 C37.3,75.472 34.112,78.607 31.742,82.534 C29.372,86.461 28.188,90.843 28.188,95.678 C28.188,100.457 29.395,104.883 31.811,108.955 C34.227,113.027 37.428,116.286 41.414,118.733 C45.401,121.18 49.722,122.403 54.378,122.403 C59.151,122.403 63.512,121.188 67.461,118.758 C71.41,116.328 74.593,113.068 77.009,108.978 C79.426,104.889 80.634,100.443 80.634,95.641 C80.634,90.855 79.447,86.494 77.072,82.556 C74.697,78.619 71.529,75.478 67.567,73.133 C63.606,70.788 59.225,69.616 54.425,69.616 Z"
+        />
+        <polygon
+          id="_7"
+          points="37.253 168.4 107.75 26.4 1 26.4 1 50.897 65.522 50.897 6.881 168.4"
+        />
+        <path
+          id="_8"
+          d="M54.622,1.091 C60.016,1.091 65.499,1.936 71.073,3.627 C76.647,5.317 81.773,7.819 86.45,11.133 C91.127,14.446 94.889,18.539 97.736,23.409 C100.583,28.28 102.006,33.896 102.006,40.256 C102.006,44.054 101.186,47.718 99.547,51.247 C97.907,54.776 95.704,57.911 92.936,60.652 C90.168,63.392 87.115,65.569 83.775,67.181 C87.612,69.108 91.249,71.682 94.684,74.902 C98.12,78.121 100.906,81.914 103.042,86.28 C105.179,90.645 106.247,95.581 106.247,101.088 C106.247,109.848 103.902,117.512 99.211,124.08 C94.52,130.647 88.236,135.755 80.359,139.402 C72.482,143.048 63.83,144.872 54.403,144.872 C44.997,144.872 36.395,142.957 28.597,139.127 C20.799,135.296 14.583,130.016 9.95,123.284 C5.317,116.553 3,108.827 3,100.106 C3,94.721 4.138,89.875 6.412,85.569 C8.688,81.263 11.543,77.552 14.978,74.436 C18.414,71.32 21.874,68.902 25.359,67.181 C22.095,65.508 19.096,63.332 16.364,60.652 C13.632,57.971 11.461,54.9 9.852,51.438 C8.242,47.975 7.438,44.345 7.438,40.547 C7.438,34.184 8.861,28.553 11.708,23.653 C14.555,18.753 18.298,14.613 22.939,11.233 C27.58,7.853 32.672,5.317 38.216,3.627 C43.759,1.936 49.228,1.091 54.622,1.091 Z M54.513,78.278 C50.263,78.278 46.29,79.156 42.595,80.912 C38.901,82.669 35.926,85.129 33.67,88.294 C31.415,91.458 30.288,95.209 30.288,99.547 C30.288,102.718 30.981,105.594 32.367,108.175 C33.754,110.756 35.607,112.992 37.928,114.881 C40.249,116.771 42.859,118.195 45.758,119.155 C48.657,120.114 51.648,120.594 54.731,120.594 C58.983,120.594 62.956,119.686 66.65,117.87 C70.344,116.055 73.336,113.546 75.628,110.344 C77.92,107.142 79.066,103.505 79.066,99.434 C79.066,96.07 78.388,93.079 77.033,90.461 C75.678,87.843 73.806,85.623 71.417,83.8 C69.029,81.977 66.385,80.601 63.487,79.672 C60.59,78.743 57.598,78.278 54.513,78.278 Z M54.513,24.828 C50.987,24.828 47.696,25.518 44.639,26.897 C41.582,28.276 39.147,30.193 37.336,32.648 C35.524,35.104 34.619,37.966 34.619,41.234 C34.619,44.88 35.628,47.964 37.645,50.484 C39.663,53.005 42.234,54.904 45.359,56.18 C48.484,57.456 51.572,58.094 54.622,58.094 C57.807,58.094 60.929,57.438 63.986,56.125 C67.043,54.812 69.596,52.896 71.644,50.375 C73.692,47.854 74.716,44.734 74.716,41.016 C74.716,37.745 73.792,34.901 71.944,32.483 C70.096,30.065 67.643,28.185 64.586,26.842 C61.529,25.499 58.171,24.828 54.513,24.828 Z"
+        />
+        <path
+          id="_9"
+          d="M53.884,28.891 C64.63,28.891 73.897,31.474 81.684,36.642 C89.472,41.81 95.502,49.246 99.775,58.95 C104.048,68.654 106.184,80.357 106.184,94.059 C106.184,111.343 103.94,125.914 99.45,137.773 C94.96,149.633 88.595,158.632 80.355,164.772 C72.114,170.911 62.39,173.981 51.181,173.981 C42.281,173.981 34.035,172.018 26.442,168.092 C18.849,164.166 12.469,158.631 7.3,151.488 L7.3,151.488 L22.7,134.662 C25.873,139.594 30.014,143.505 35.122,146.397 C40.23,149.289 45.71,150.734 51.562,150.734 C57.573,150.734 62.767,149.12 67.144,145.892 C71.521,142.664 74.939,138.014 77.398,131.942 C79.858,125.87 81.154,118.561 81.287,110.016 C79.481,113.166 77.091,115.933 74.116,118.317 C71.141,120.702 67.749,122.511 63.941,123.747 C60.132,124.982 55.97,125.6 51.453,125.6 C42.205,125.6 33.818,123.512 26.291,119.336 C18.764,115.16 12.833,109.502 8.5,102.361 C4.167,95.22 2,87.214 2,78.341 C2,69.155 4.279,60.832 8.836,53.372 C13.393,45.911 19.598,39.966 27.452,35.536 C35.305,31.106 44.116,28.891 53.884,28.891 Z M53.772,51.578 C49.082,51.578 44.742,52.795 40.752,55.23 C36.761,57.664 33.563,60.889 31.158,64.903 C28.753,68.918 27.55,73.397 27.55,78.341 C27.55,83.091 28.738,87.443 31.113,91.398 C33.487,95.354 36.67,98.504 40.661,100.848 C44.652,103.193 49.022,104.366 53.772,104.366 C58.657,104.366 63.062,103.193 66.986,100.848 C70.91,98.504 74.059,95.354 76.434,91.398 C78.809,87.443 79.997,83.091 79.997,78.341 C79.997,73.47 78.794,69.009 76.389,64.958 C73.984,60.907 70.801,57.664 66.841,55.23 C62.88,52.795 58.524,51.578 53.772,51.578 Z"
+        />
+        <path
+          id="_c"
+          d="M65.906,114.197 L65.906,143.091 L44,143.091 L44,114.197 L65.906,114.197 Z M65.906,39.4 L65.906,68.294 L44,68.294 L44,39.4 L65.906,39.4 Z"
+        />
+        <path
+          id="_a"
+          d="M52.672,36.441 C67.509,36.441 79.11,40.17 87.475,47.63 C95.84,55.089 100.022,65.78 100.022,79.703 L100.022,79.703 L100.022,113.169 L100.025,113.545 C100.066,116.144 100.544,118.006 101.458,119.133 C102.415,120.313 104.044,121 106.344,121.194 L106.344,121.194 L106.344,143.091 L105.573,143.236 C103.537,143.612 101.662,143.899 99.948,144.097 C98.02,144.32 96.356,144.431 94.956,144.431 C89.619,144.431 85.586,143.253 82.858,140.897 C80.13,138.541 78.452,135.584 77.825,132.028 L77.825,132.028 L77.247,126.691 L76.799,127.26 C72.285,132.91 66.741,137.268 60.167,140.336 C53.374,143.506 46.439,145.091 39.359,145.091 C32.426,145.091 26.196,143.642 20.669,140.745 C15.142,137.848 10.815,133.907 7.689,128.92 C4.563,123.934 3,118.35 3,112.169 C3,105.323 4.915,99.346 8.744,94.239 C12.573,89.132 17.866,85.154 24.623,82.306 C31.381,79.458 39.159,78.034 47.959,78.034 C52.386,78.034 56.854,78.386 61.362,79.091 C65.871,79.795 69.824,80.85 73.222,82.256 L73.222,82.256 L73.222,76.641 L73.218,76.147 C73.122,69.769 71.16,64.821 67.33,61.303 C63.402,57.695 57.579,55.891 49.862,55.891 C44.069,55.891 38.568,56.894 33.361,58.9 C28.154,60.906 22.677,63.812 16.931,67.619 L16.931,67.619 L8.456,50.169 L9.288,49.622 C15.944,45.289 22.753,42.032 29.714,39.85 C36.965,37.577 44.618,36.441 52.672,36.441 Z M52.144,93.584 C45.194,93.584 39.493,95.066 35.042,98.028 C30.591,100.991 28.366,104.936 28.366,109.866 C28.366,112.539 29.101,115.081 30.57,117.492 C32.04,119.904 34.166,121.854 36.947,123.344 C39.728,124.833 43.087,125.578 47.025,125.578 C51.05,125.578 54.973,124.809 58.794,123.27 C62.615,121.732 65.721,119.776 68.112,117.403 C69.652,115.899 70.889,114.33 71.822,112.697 C72.755,111.064 73.222,109.58 73.222,108.247 L73.222,108.247 L73.222,97.594 L72.409,97.289 C69.409,96.193 66.204,95.316 62.792,94.659 C59.07,93.943 55.521,93.584 52.144,93.584 Z"
+        />
+        <path
+          id="_p"
+          d="M59.644,36.441 C66.783,36.441 73.323,37.847 79.263,40.659 C85.202,43.472 90.372,47.382 94.772,52.389 C99.172,57.396 102.59,63.148 105.027,69.644 C107.463,76.14 108.681,83.102 108.681,90.531 C108.681,100.698 106.73,109.915 102.827,118.181 C98.923,126.448 93.514,132.999 86.598,137.836 C79.683,142.672 71.745,145.091 62.784,145.091 C54.672,145.091 47.523,143.243 41.337,139.547 C35.152,135.851 30.306,130.918 26.8,124.747 L26.8,124.747 L26.8,185.691 L0,185.691 L0,38.331 L23.447,38.331 L23.447,56.216 L23.833,55.629 C27.728,49.806 32.654,45.181 38.611,41.753 C44.766,38.211 51.777,36.441 59.644,36.441 Z M52.266,59.216 C49.728,59.216 47.15,59.651 44.531,60.52 C41.913,61.39 39.431,62.624 37.086,64.222 C34.741,65.82 32.668,67.688 30.866,69.827 C29.064,71.965 27.708,74.334 26.8,76.934 L26.8,76.934 L26.8,101.503 L27.095,102.183 C28.7,105.786 30.803,109.077 33.403,112.053 C36.166,115.216 39.326,117.717 42.883,119.556 C46.44,121.396 50.101,122.316 53.866,122.316 C57.984,122.316 61.723,121.441 65.081,119.692 C68.44,117.943 71.333,115.581 73.761,112.605 C76.189,109.629 78.053,106.228 79.353,102.403 C80.653,98.578 81.303,94.591 81.303,90.441 C81.303,86.082 80.583,82.021 79.144,78.256 C77.704,74.492 75.667,71.185 73.031,68.336 C70.396,65.487 67.318,63.255 63.797,61.639 C60.276,60.023 56.432,59.216 52.266,59.216 Z"
+        />
+        <path
+          id="_m"
+          d="M17.879,143.091 L17.879,81.894 C19.24,75.371 21.504,70.106 24.672,66.098 C27.839,62.091 31.134,60.087 34.556,60.087 C37.978,60.087 40.635,62.022 42.526,65.892 C44.418,69.762 45.364,75.908 45.364,84.331 L45.364,84.331 L45.364,143.091 L63.243,143.091 L63.243,82.003 C64.604,75.555 66.856,70.291 69.998,66.209 C73.141,62.128 76.448,60.087 79.92,60.087 C83.342,60.087 86.011,62.041 87.927,65.948 C89.843,69.856 90.801,75.983 90.801,84.331 L90.801,84.331 L90.801,143.091 L108.68,143.091 L108.68,77.625 C108.68,72.56 108.384,67.587 107.793,62.705 C107.202,57.822 106.155,53.399 104.654,49.436 C103.153,45.472 101.036,42.316 98.303,39.966 C95.57,37.616 92.061,36.441 87.778,36.441 C82.205,36.441 77.216,38.352 72.808,42.173 C68.401,45.995 64.781,51.469 61.949,58.594 C61.067,52.39 59.012,47.146 55.784,42.864 C52.555,38.582 48.05,36.441 42.268,36.441 C36.455,36.441 31.321,38.27 26.864,41.928 C22.407,45.586 18.836,50.831 16.151,57.663 L16.151,57.663 L16.151,38.331 L0,38.331 L0,143.091 L17.879,143.091 Z"
+        />
+      </defs>
+      <g id="clock">
+        <g id="time-str" fill="var(--time-color)">
+          <use
+            id="__0"
+            transform="                 scale(0.475, 0.4875)"
+            xlink:href="#_0"
+          />
+          <use
+            id="__1"
+            transform="translate(55,0)  scale(0.475, 0.4875)"
+            xlink:href="#_0"
+          />
+          <use
+            id="__2"
+            transform="translate(95,0)  scale(0.475, 0.4875)"
+            xlink:href="#_c"
+            class="separator"
+          />
+          <use
+            id="__3"
+            transform="translate(135,0) scale(0.475, 0.4875)"
+            xlink:href="#_0"
+          />
+          <use
+            id="__4"
+            transform="translate(190,0) scale(0.475, 0.4875)"
+            xlink:href="#_0"
+          />
+        </g>
+        <g fill="var(--seconds-color)">
+          <use
+            id="__6"
+            transform="translate(245,0)   scale(0.2375, 0.25)"
+            xlink:href="#_0"
+          />
+          <use
+            id="__7"
+            transform="translate(272.5,0) scale(0.2375, 0.25)"
+            xlink:href="#_0"
+          />
+        </g>
+        <g fill="var(--ampm-color)">
+          <use
+            id="__8"
+            transform="translate(245,45)  scale(0.175, 0.20)"
+            xlink:href="#_p"
+          />
+          <use
+            id="__9"
+            transform="translate(268,45)  scale(0.275, 0.20)"
+            xlink:href="#_m"
+          />
+        </g>
+      </g>
+      <g font-family="inherit">
+        <text
+          id="date-str"
+          x="0"
+          y="108"
+          font-size="32"
+          fill="var(--date-color)"
+          font-weight="400"
+          textLength="300"
+          lengthAdjust="spacingAndGlyphs"
+        >
+          If you see this, it's broken!
+        </text>
+      </g>
+      <g id="pomodoro" stroke="none">
+        <rect
+          id="pd5"
+          x="200"
+          y="118"
+          width="100"
+          height="2"
+          fill="var(--pd-inactive-color)"
+          visibility="hidden"
+        />
+        <rect
+          id="pd4"
+          x="150"
+          y="118"
+          width="50"
+          height="2"
+          fill="var(--pd-rest-rem-color)"
+          visibility="hidden"
+        />
+        <rect
+          id="pd3"
+          x="100"
+          y="118"
+          width="50"
+          height="2"
+          fill="var(--pd-rest-cur-color)"
+          visibility="hidden"
+        />
+        <rect
+          id="pd2"
+          x="50"
+          y="118"
+          width="50"
+          height="2"
+          fill="var(--pd-work-rem-color)"
+          visibility="hidden"
+        />
+        <rect
+          id="pd1"
+          x="0"
+          y="118"
+          width="50"
+          height="2"
+          fill="var(--pd-work-cur-color)"
+          visibility="hidden"
+        />
+      </g>
+    </svg>
+    <!-- Analog clock -->
+    <svg
+      id="analog-clock"
+      class="hide"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 200 200"
+    >
+      <defs>
+        <linearGradient id="g1" x1="100%" y1="0%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#bbb" />
+          <stop offset="100%" stop-color="#eee" />
+        </linearGradient>
+        <radialGradient id="g2" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+          <stop offset="0%" stop-color="#eee" />
+          <stop offset="100%" stop-color="#bbb" />
+        </radialGradient>
+        <linearGradient id="g3" x1="100%" y1="0%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#ddd" />
+          <stop offset="100%" stop-color="#ccc" />
+        </linearGradient>
+      </defs>
+      <g id="clock-face">
+        <circle cx="100" cy="100" r="100" stroke="none" fill="url(#g1)" />
+        <circle cx="100" cy="100" r="80" stroke="none" fill="url(#g2)" />
+        <text
+          id="face-name"
+          x="100"
+          y="60"
+          text-anchor="middle"
+          dominant-baseline="middle"
+        ></text>
+        <circle
+          id="face-ring"
+          cx="100"
+          cy="100"
+          r="99"
+          stroke-width="2"
+          stroke="var(--anlg-name)"
+          fill="none"
+        />
+      </g>
+      <g id="pomodoro" fill="none" stroke-width="2.5" stroke-linecap="butt">
+        <path id="pa5" visibility="hidden" stroke="var(--pd-inactive-color)" />
+        <path id="pa4" visibility="hidden" stroke="var(--pd-rest-rem-color)" />
+        <path id="pa3" visibility="hidden" stroke="var(--pd-rest-cur-color)" />
+        <path id="pa2" visibility="hidden" stroke="var(--pd-work-rem-color)" />
+        <path id="pa1" visibility="hidden" stroke="var(--pd-work-cur-color)" />
+      </g>
+      <g id="markers" stroke-linecap="round"></g>
+      <g id="date">
+        <g stroke="#aaa" stroke-width="0.2">
+          <rect
+            x="120"
+            y="94"
+            width="20"
+            height="12"
+            rx="2"
+            ry="2"
+            fill="url(#g3)"
+          />
+          <rect
+            x="140"
+            y="94"
+            width="15"
+            height="12"
+            rx="2"
+            ry="2"
+            fill="url(#g3)"
+          />
+          <rect
+            x="155"
+            y="94"
+            width="20"
+            height="12"
+            rx="2"
+            ry="2"
+            fill="url(#g3)"
+          />
+        </g>
+        <g stroke="var(--anlg-time)" stroke-width="0.3" fill="var(--anlg-fill)">
+          <text
+            id="dow-str"
+            x="130"
+            y="101"
+            textLength="16"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            lengthAdjust="spacingAndGlyphs"
+          ></text>
+          <text
+            id="day-str"
+            x="147.5"
+            y="101"
+            textLength="11"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            lengthAdjust="spacingAndGlyphs"
+          ></text>
+          <text
+            id="mth-str"
+            x="165"
+            y="101"
+            textLength="16"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            lengthAdjust="spacingAndGlyphs"
+          ></text>
+        </g>
+      </g>
+      <g id="hands" stroke-linecap="round">
+        <line
+          id="hour-hand"
+          x1="100"
+          y1="93"
+          x2="100"
+          y2="40"
+          class="hour-hand"
+        />
+        <line
+          id="hour-hand-2"
+          x1="100"
+          y1="93"
+          x2="100"
+          y2="87"
+          class="hour-hand"
+        />
+        <line
+          id="minute-hand"
+          x1="100"
+          y1="93"
+          x2="100"
+          y2="5"
+          class="minute-hand"
+        />
+        <line
+          id="minute-hand-2"
+          x1="100"
+          y1="93"
+          x2="100"
+          y2="85"
+          class="minute-hand"
+        />
+        <line
+          id="second-hand"
+          x1="100"
+          y1="93"
+          x2="100"
+          y2="12"
+          class="second-hand"
+        />
+        <line
+          id="second-hand-2"
+          x1="100"
+          y1="93"
+          x2="100"
+          y2="83"
+          class="second-hand"
+        />
+        <circle
+          cx="100"
+          cy="100"
+          r="7"
+          fill="url(#g3)"
+          stroke="#aaa"
+          stroke-width="0.2"
+        />
+      </g>
+    </svg>
+    <!-- Footer -->
+    <footer id="footer">
+      &copy; 2017-2025 Silvino R. |
+      <input type="checkbox" id="pomodoro-checkbox" />
+      <label for="pomodoro-checkbox"><u>P</u>omodoro</label>
+      <span class="sound-span hide"
+        >&raquo; <label class="small" for="work-for-input">Work</label>
+        <input type="number" id="work-for-input" min="1" max="120" /> &middot;
+        <label class="small" for="rest-for-input">Rest</label>
+        <input type="number" id="rest-for-input" min="1" max="120" /> &middot;
+        <input type="checkbox" id="sound-checkbox" />
+        <label for="sound-checkbox">&#x266B;</label>
+      </span>
+      |
+      <span id="analog-span" class="show"
+        ><input type="checkbox" id="analog-checkbox" />
+        <label for="analog-checkbox"><u>A</u>nalog</label></span
+      >
+      <span class="analog-span hide"
+        >&raquo;
+        <input
+          type="text"
+          maxlength="25"
+          id="face-name-input"
+          placeholder="Face Name"
+      /></span>
+    </footer>
+
+    <script>
+      const months = new Array(
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      );
+      const days = new Array(
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      );
+      const CLOCK_REFRESH = 1000;
+      const FOOTER_SHOW_DURATION = 1000;
+      const FOOTER_HIDE_DURATION = 5000;
+      const DEBOUNCE_POLL_RATE = 200; // 25 minutes
+
+      let isVisible = true;
+      let isDebug = false;
+      const oGTitle = document.title;
+      var wakeLockSupported = false;
+      let wakeLock = null;
+      let clockInterval = null;
+
+      var lastMousePosition = { x: null, y: null };
+      var debounceTimeout = null;
+      var isMouseMoving = false;
+      var footerTimeout = null;
+      var isFooterVisible = false;
+
+      let pmdrWorkFor = 25; // default
+      let pmdrRestFor = 5; // default
+
+      let audioCtx;
+      let toneStart = null;
+      let toneEnd = null;
+
+      let lastFaviconHour = -1;
+      let lastFaviconMins = -1;
+
+      // --- vars as Objects, i.e. getter and setter pair :) ---
+
+      const analogCheckbox = document.getElementById("analog-checkbox");
+      Object.defineProperty(window, "isAnalogOn", {
+        get() {
+          return analogCheckbox.checked;
+        },
+        set(value) {
+          analogCheckbox.checked = Boolean(value);
+        },
       });
-    }
 
-    // ----- -----
-    function setShowClassByClass(classN, visible = true) {
-      toggleClassByClass(classN, visible, 'show', 'hide');
-    }    
+      const pomodoroCheckbox = document.getElementById("pomodoro-checkbox");
+      Object.defineProperty(window, "isPomodoroOn", {
+        get() {
+          return pomodoroCheckbox.checked;
+        },
+        set(value) {
+          pomodoroCheckbox.checked = Boolean(value);
+        },
+      });
 
-    // ----- Set X and Width by Id (does not set Y and Height) -----
-    function setXAndWidthById(id, x, width) {
-      const element = document.getElementById(id);
-      if (element) {
-        let newX = x.toFixed(3);
-        let newWidth = width.toFixed(3);
+      const soundCheckbox = document.getElementById("sound-checkbox");
+      Object.defineProperty(window, "isSoundOn", {
+        get() {
+          return soundCheckbox.checked;
+        },
+        set(value) {
+          soundCheckbox.checked = Boolean(value);
+        },
+      });
 
-        setVisibilityById(id, true);  // assume you want to see it
-        if (element.getAttribute("x") !== newX) {
-          element.setAttribute("x", newX);
-        }
-        if (element.getAttribute("width") !== newWidth) {
-          element.setAttribute("width", newWidth);
-        }
-      }
-    }
+      /* ------------ Helpers ------------ */
 
-    // ----- Draw pomodoro segments -----
-    function setRingSegmentPathById(id, startAngle, endAngle) {
-      // Convert angles from degrees to radians
-      const startRad = (startAngle - 90) * Math.PI / 180; // -90 to start at 12 o'clock
-      const endRad = (endAngle - 90) * Math.PI / 180;
-      
-      const radius = 78;
-      
-      // Calculate start and end points
-      const startX = (100 + radius * Math.cos(startRad)).toFixed(3);
-      const startY = (100 + radius * Math.sin(startRad)).toFixed(3);
-      const endX = (100 + radius * Math.cos(endRad)).toFixed(3);
-      const endY = (100 + radius * Math.sin(endRad)).toFixed(3);
-      
-      // Determine if we need the large arc flag
-      const diff = (endAngle < startAngle) ? (startAngle - endAngle) : (endAngle - startAngle);
-      const largeArcFlag = diff > 180 ? "1" : "0";
-      
-      // Create the SVG path with both large arc and sweep flags
-      const pathData =
-        `M ${startX} ${startY} ` +
-        `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`;
-      
-      // Update the path element
-
-      setVisibilityById(id, true);
-      document.getElementById(id).setAttribute("d", pathData);
-    }
-
-
-    // ----- Update Pomodoro progress -----
-    function updatePomodoro(now) {
-      const minutes = now.getMinutes();
-      const seconds = now.getSeconds();
-      const maxVal = (pmdrWorkFor + pmdrRestFor) * 60;
-      const splitAt = pmdrWorkFor / (pmdrWorkFor + pmdrRestFor);
-
-      var progress = (minutes * 60) + seconds;
-      while (progress > maxVal) progress -= maxVal;
-      const percentage = progress / maxVal;
-
-      if (isSoundOn) {
-        if (Math.round(percentage * 1000) === Math.round(splitAt * 1000)) {
-          playSound(toneStart);
-        }
-        if (percentage == 1) {
-          playSound(toneEnd);
-        }
-      }
-
-      if (!isAnalogOn) {
-        // Digital
-        const knownSvgWidth = 300;
-
-        if (percentage <= splitAt) {
-          let cut = percentage;
-          setXAndWidthById("pd1", 0, cut * knownSvgWidth);
-          setXAndWidthById("pd2", cut * knownSvgWidth, (splitAt - cut) * knownSvgWidth);
-          setVisibilityById("pd3", false);
-          setVisibilityById("pd4", false);
-          setXAndWidthById("pd5", splitAt * knownSvgWidth, (1 - splitAt) * knownSvgWidth);
-        } else {
-          let cut = percentage - splitAt;
-          setVisibilityById("pd1", false);
-          setVisibilityById("pd2", false);
-          setXAndWidthById("pd3", splitAt * knownSvgWidth, cut * knownSvgWidth);
-          setXAndWidthById("pd4", (splitAt + cut) * knownSvgWidth, (1 - splitAt + cut) * knownSvgWidth);
-          setXAndWidthById("pd5", 0, splitAt * knownSvgWidth);
-        }
-      } else {
-        // Analog
-        const multiplier = 2;
-
-        if (percentage <= splitAt) {
-          setRingSegmentPathById("pa1", 0, percentage * 360);
-          setRingSegmentPathById("pa2", percentage * 360, splitAt * 360);
-          setVisibilityById("pa3", false);
-          setVisibilityById("pa4", false);
-          setRingSegmentPathById("pa5", splitAt * 360, 360);
-        } else {  
-          setVisibilityById("pa1", false);
-          setVisibilityById("pa2", false);
-          setRingSegmentPathById("pa3", splitAt * 360, percentage * 360);
-          setRingSegmentPathById("pa4", percentage * 360, 360);
-          setRingSegmentPathById("pa5", 0, splitAt * 360);
-        }
-      }
-    }
-
-    // ----- Update Title of the page (tab in browser) -----
-    function updateTitle(now) {
-      const hours = now.getHours();
-      const minutes = now.getMinutes();
-      const title = String(hours).padStart(2, '0') + ":" + String(minutes).padStart(2, '0');
-      if (title !== document.title) document.title = title;
-    }
-
-    // ----- Update the favicon -----
-    function updateFavicon(now) {
-      if (now) {
-        const hours = now.getHours() % 12;
-        const minutes = now.getMinutes();
-        if ((minutes == lastFaviconMins) && (hours == lastFaviconHour)) return; // do nothing
-        if (hours != lastFaviconHour) lastFaviconHour = hours;
-        lastFaviconMins = minutes;
-
-        const svg = 
-          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" stroke-linecap="round" stroke="#876" stroke-width="7.25">' +
-          '<circle cx="50" cy="50" r="36.5" fill="none"/>' +
-          `<line x1="50" y1="50" x2="${50 + 17.5 * Math.sin(2 * Math.PI * hours / 12)}" y2="${50 - 17.5 * Math.cos(2 * Math.PI * hours / 12)}"/>` +
-          `<line x1="50" y1="50" x2="${50 + 22.5 * Math.sin(2 * Math.PI * minutes / 60)}" y2="${50 - 22.5 * Math.cos(2 * Math.PI * minutes / 60)}"/>` +
-          '</svg>';
-        const encoded = "data:image/svg+xml;base64," + btoa(svg);
-        document.getElementById('favicon').href = encoded;
-      } else if (lastFaviconMins != -1) {
-        document.getElementById('favicon').href = 'favicon.svg';
-        lastFaviconMins = -1;
-      }
-    }
-
-    // ----- Update all handlers -----
-    function updateAll() {
-      if (isVisible) {
-        const now = new Date();
-        updateClock(now);
-        updateTitle(now);
-        updateFavicon(now);
-        if (isPomodoroOn) updatePomodoro(now);
-      } else {
-        if (oGTitle !== document.title) {
-          document.title = oGTitle;
-          updateFavicon(false);
-        }
-      }
-    }
-
-    // ----- Visibility change handler -----
-    async function handleVisibilityChange(event) {
-      if (document.visibilityState === "hidden") { 
-        isVisible = false;
-      } else if (document.visibilityState === "visible") {
-        isVisible = true;
-      } else {
-        isVisible = true;  // what's your fallback choice?
-      }
-
-      if (wakeLockSupported) {
-        if (isVisible) {
-          if (wakeLock === null) {
-            try {
-              wakeLock = await navigator.wakeLock.request("screen");
-              wakeLock.addEventListener("release", () => {
-                wakeLock = null;
-              });
-            } catch (err) {
-              __( `Wake Lock Error: ${err.name}, ${err.message}`, 0 );
-            }
-          }
-        } else {
-          // !isVisible
-          if (wakeLock !== null) {
-            wakeLock.release().then(() => {
-              wakeLock = null;
-            });
-          }
-        }
-      }
-
-      updateAll();
-    }
-
-    // ----- Footer bar visibility handler -----
-    function handleFooterVisibility(event) {
-      if (isFooterVisible) {
-        toggleClassById('footer', false, 'show', 'hide');
-        document.body.style.cursor = 'none';
-        isFooterVisible = false;
-      } else if (isMouseMoving) {
-        toggleClassById('footer', true, 'show', 'hide');
-        document.body.style.cursor = 'default';
-        isFooterVisible = true;
-      }
-      clearTimeout(footerTimeout);
-      footerTimeout = null; // must reset to pass `=== null` test
-    }
-
-    // ----- Debounce handler -----
-    function handleDebounce(event) {
-      if (null !== debounceTimeout) clearTimeout(debounceTimeout);
-      debounceTimeout = null;
-      isMouseMoving = false;
-      if (isFooterVisible) {
-        if (null !== footerTimeout) clearTimeout(footerTimeout); // reset
-        footerTimeout = setTimeout(handleFooterVisibility, FOOTER_HIDE_DURATION);  
-      }
-    }
-
-    // ----- Mouse move handler -----
-    function handleMouseMove(event) {
-      let eventX = (null === event) ? null : event.clientX;
-      let eventY = (null === event) ? null : event.clientY;
-      if (
-        lastMousePosition.x === null ||
-        lastMousePosition.y === null ||
-        (lastMousePosition.x !== eventX || lastMousePosition.y !== eventY)
-      ) {
-        isMouseMoving = true;
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(handleDebounce, DEBOUNCE_POLL_RATE);
-        lastMousePosition.x = eventX;
-        lastMousePosition.y = eventY;
-        if (!isFooterVisible && footerTimeout === null) {
-          footerTimeout = setTimeout(handleFooterVisibility, FOOTER_SHOW_DURATION);  
-        }
-      }
-    }
-
-    // ----- Key event handler -----
-    function handleKeyEvent(event) {
-      handleMouseMove(null);
-    }
-
-    // ----- Double click handler -----
-    function handleDoubleClick(event) {
-      if (event.target.closest('footer') !== null) return;
-      if (!document.fullscreenElement) {
-        let element = document.documentElement;
-        if (element.requestFullscreen) {
-          element.requestFullscreen();
-        } else if (element.webkitRequestFullscreen) {
-          element.webkitRequestFullscreen();
-        } else {
-          __("Fullscreen API not supported", 0);
-        }      
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        }
-      }
-    }
-
-    // ----- Handle Pomodoro activation -----
-    function handlePomodoroSwitchChange(event) {
-      if (isPomodoroOn) {
-        safeSetItem("isPomodoroOn", isPomodoroOn);
-      } else {
-        localStorage.removeItem("isPomodoroOn");
-      }
-      if (isPomodoroOn) {
-        let now = new Date();
-        updatePomodoro(now);
-      } else {
-        for (let i = 1; i <= 5; i++) {
-          setVisibilityById("pd"+i, false);
-          setVisibilityById("pa"+i, false);
-        }
-      }
-      setShowClassByClass('sound-span', isPomodoroOn);
-    }
-
-    // ----- -----
-    function getValueById(id) {
-      const el = document.getElementById(id);
-      if (el) {
-        return el.value;
-      } else
-        return false;
-    }
-
-    // ----- -----
-    function handlePomodoroValueChange(event) {
-      const wantedWork = parseInt( getValueById('work-for-input') );
-      const wantedRest = parseInt( getValueById('rest-for-input') );
-
-      if ( (wantedWork <= 0) || (wantedWork > 120) || (wantedRest <= 0) || (wantedRest > 120) ) return;
-
-      const savedWork = safeGetItem('pomodoroWorkFor', false);
-      const savedRest = safeGetItem('pomodoroRestFor', false);
-
-      if ((savedWork != wantedWork) || (savedRest != wantedRest)) {
-        if (wantedWork && (savedWork != wantedWork)) {
-          safeSetItem('pomodoroWorkFor', wantedWork);
-          pmdrWorkFor = Number(wantedWork);
-        }
-        if (wantedRest && (savedRest != wantedRest)) {
-          safeSetItem('pomodoroRestFor', wantedRest);
-          pmdrRestFor = Number(wantedRest);
-        }
-        let now = new Date();
-        updatePomodoro(now);
-      }
-    }
-
-    // ----- -----
-    function handleAnalogChange(event) {
-      activateAnalog(isAnalogOn);
-    }
-
-    // ----- -----
-    async function handleSoundChange(event) {
-      const el = document.getElementById('sound-checkbox');
-      if (el) {
-        try {
-          if (el.checked) {
-            // user gesture: safe to create/resume and load sounds
-            audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === "suspended") await audioCtx.resume();
-            if (!(toneStart instanceof AudioBuffer)) toneStart = await loadSound("tone_start.mp3");
-            if (!(toneEnd instanceof AudioBuffer)) toneEnd = await loadSound("tone_end.mp3");
-            playSound(toneStart);
+      function __(msg, level = 3) {
+        // Level: 0 = error, 1 = warn, 2 = info, >=3 = log
+        if (level <= 0) {
+          console.error(msg);
+        } else if (level == 1) {
+          console.warn(msg);
+        } else if (isDebug) {
+          if (level == 2) {
+            console.info(msg);
           } else {
-            // turn sound off
-            if (audioCtx && audioCtx.state !== "closed") await audioCtx.suspend();
+            console.log(msg);
           }
-        } catch (err) {
-          __(`Sound toggle failed: ${err.name} ${err.message}`, 0);
         }
       }
-    }
 
-    // ----- -----
-    function handelFaceNameChange(event) {
-      const el = document.getElementById('face-name-input');
-      if (el) {
-        const faceName = el.value;
-        document.getElementById("face-name").textContent = faceName;
-        if (faceName === "") {
-          localStorage.removeItem("faceName");
-        } else {
-          safeSetItem("faceName", faceName);
+      // ----- Truthy function -----
+      function isTrue(value, fallback = true) {
+        if (typeof value === "boolean") return value;
+        if (value === undefined || value === null || value === "")
+          return fallback;
+        if (typeof value === "string") {
+          value = value.trim().toLowerCase();
+          if (value.length > 0) value = value[0];
         }
-
-        // fake keep alive
-        handleDebounce();
-        handleMouseMove(null);
-      }
-    }
-
-    // ----- -----
-    function isTypingInInput(event) {
-      const target = event.target;
-      return target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
-    }    
-
-    // ----- -----
-    function handleKeyPress(event) {
-      if (!event) return;
-      const eventKey = event.key.toLowerCase();
-      const isNotTII = !isTypingInInput(event);
-
-      if ((eventKey === 'p') && isNotTII) {
-        const el = document.getElementById('pomodoro-checkbox');
-        if (el) {
-          el.checked = !el.checked;
-        }
-        handlePomodoroSwitchChange(event);
-      }
-
-      if (((eventKey === 'a') || (eventKey === 'd')) && isNotTII) {
-        const el = document.getElementById('analog-checkbox');
-        if (el) {
-          el.checked = !el.checked;
-        }
-        handleAnalogChange(event);
-      }
-
-      // Browser only allows sound if the interaction is a mouse ?? // TODO : fact check?
-      if (isPomodoroOn && (eventKey === 's') && isNotTII) {
-        const el = document.getElementById('sound-checkbox');
-        if (el) {
-          el.checked = !el.checked;
-        }
-        handleSoundChange(event);
-      }
-    }
-
-    // ----- -----
-    function safeSetItem(key, value) {
-      try {
-        localStorage.setItem(key, value);
-      } catch (err) {
-        __(`localStorage.setItem: ${err.name}, ${err.message}`, 0);
-      }
-    }
-
-    // ----- -----
-    function safeGetItem(key, fallback = false) {
-      var ret;
-      try {
-        ret = localStorage.getItem(key);
-      } catch (err) {
-        __(`localStorage.setItem: ${err.name}, ${err.message}`, 0);
+        const trueValues = ["t", "y", "1", 1];
+        if (trueValues.includes(value)) return true;
+        const falseValues = ["0", 0, "n", "f"];
+        if (falseValues.includes(value)) return false;
+        if (typeof value === "number") return value !== 0;
         return fallback;
       }
-      if (null === ret) return fallback; // not there, fallback
-      return ret;
-    }
 
-    // ----- -----
-    function processConfig(config) {
-      if (typeof config !== 'object') return;
+      // // ----- Checkbox, by Id, get if checked -----
+      // function getCheckboxCheckedById(checkboxId) {
+      //   const checkbox = document.getElementById(checkboxId);
+      //   if (checkbox && checkbox.type === 'checkbox') return checkbox.checked;
+      //   return false;
+      // }
 
-      const faceName = config['faceName'];
-      if (faceName) {
-        document.getElementById("face-name").textContent = faceName;
-        document.getElementById("face-name-input").value = faceName;
+      // ----- Set content by Id -----
+      function setContentById(elementId, newValue) {
+        const element = document.getElementById(elementId);
+        if (element && newValue !== element.textContent)
+          element.textContent = newValue;
       }
 
-      const wantsAnalogOn = isTrue(config['isAnalogOn'], false);
-      if (wantsAnalogOn) isAnalogOn = true;
+      // ----- Update SVG Clock -----
+      function updateClock(now) {
+        var hours = now.getHours();
+        const tHourStr = hours < 12 ? "am" : "pm";
+        if (hours > 12) hours -= 12;
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        const month = now.getMonth();
+        const day = now.getDate();
+        const weekday = now.getDay();
 
-      const wantsPomodoroOn = isTrue(config['isPomodoroOn'], false);
-      isPomodoroOn = wantsPomodoroOn;
-      setShowClassByClass('sound-span', wantsPomodoroOn);
+        if (!isAnalogOn) {
+          // Digital
 
-      const pomodoroWorkFor = Number(config['pomodoroWorkFor']);
-      if (!Number.isNaN(pomodoroWorkFor)) pmdrWorkFor = pomodoroWorkFor;
-      const pomodoroRestFor = Number(config['pomodoroRestFor']);
-      if (!Number.isNaN(pomodoroRestFor)) pmdrRestFor = pomodoroRestFor;
+          const hourStr = String(hours).padStart(2, "0");
+          const minsStr = String(minutes).padStart(2, "0");
+          const secsStr = String(seconds).padStart(2, "0");
 
-      setAttributeById('work-for-input', 'value', pmdrWorkFor);
-      setAttributeById('rest-for-input', 'value', pmdrRestFor);
-    }
+          setAttributeById("__0", "xlink:href", `#_${hourStr[0]}`);
+          setAttributeById("__1", "xlink:href", `#_${hourStr[1]}`);
+          setAttributeById("__3", "xlink:href", `#_${minsStr[0]}`);
+          setAttributeById("__4", "xlink:href", `#_${minsStr[1]}`);
+          setAttributeById("__6", "xlink:href", `#_${secsStr[0]}`);
+          setAttributeById("__7", "xlink:href", `#_${secsStr[1]}`);
 
-    // ----- Initialisation code -----
-    async function performInit() {
-      let config = {};
-      config['ping'] = Date.now(); // need this otherwise an empty localStorage causes issues
-      try {
-        if (localStorage) {
-          for (let i = 0; i < localStorage.length; i++) {
-            let key = localStorage.key(i);
-            config[key] = localStorage.getItem(key);
-          }
-        }
-      } catch (err) {
-        __(err, 0);
-      }
+          toggleClassById("time-str", seconds % 2 === 0, "even", "odd");
 
-      const isInitialised = safeGetItem('clockInitialised', false);
-      if (false == isInitialised) {
-        __('Loading config from file');
-        fetch("config.json")
-          .then(response => {
-            return response.json();
-          })
-          .then(settings => {
-            // Store each root level setting in localStorage
-            Object.keys(settings).forEach(key => {
-              safeSetItem(key, settings[key]);
-              config[key] = settings[key];
-            });
-            processConfig(config);
-            safeSetItem("clockInitialised", true);
-          })
-          .catch(err => {
-            __(`Error loading settings: ${err.name} ${err.message}`, 0);
-            safeSetItem("clockInitialised", true);
-            return error
-          });
-      } else {
-        processConfig(config);
-      }
-      return Promise.resolve();
-    }
+          setAttributeById("__8", "xlink:href", `#_${tHourStr[0]}`);
 
-    // ----- Swap modes function, digital<->analog -----
-    function activateAnalog(active) {
-      if (active) {
-        document.body.classList.remove("digital");
-        document.body.classList.add("analog");
-        setShowClassById("digital-clock", false);
-        setShowClassById("analog-clock", true);
-        safeSetItem("isAnalogOn", true);
-        setShowClassByClass('analog-span', true);
-        isAnalogOn = true;
-      } else {
-        document.body.classList.remove("analog");
-        document.body.classList.add("digital");
-        setShowClassById("analog-clock", false);
-        setShowClassById("digital-clock", true);
-        localStorage.removeItem("isAnalogOn");
-        setShowClassByClass('analog-span', false);
-        isAnalogOn = false;
-      }
-      updateAll();
-    }
+          const year = now.getFullYear();
+          const fullDateStr =
+            days[weekday] + ", " + day + " " + months[month] + " " + year;
+          setContentById("date-str", fullDateStr);
+        } else {
+          // Analog
 
-    // ----- -----
-    function setSvgLineAttributes(line, x1, y1, x2, y2, className, strokeWidth, rotate = 0) {
-      line.setAttribute("x1", x1);
-      line.setAttribute("y1", y1);
-      line.setAttribute("x2", x2);
-      line.setAttribute("y2", y2);
-      line.setAttribute("class", className);
-      line.setAttribute("stroke-width", strokeWidth);
-      if (rotate !== 0) {
-        line.setAttribute("transform", `rotate(${rotate} 100 100)`);
-      }
-    }
+          const hourAngle = (hours % 12) * 30 + minutes * 0.5;
+          const minuteAngle = minutes * 6 + seconds * 0.1;
+          const secondAngle = seconds * 6;
 
-    // ----- -----
-    function drawAnalogClockFace() {
-      const svg = document.getElementById('analog-clock');
-      const markers = document.getElementById('markers');
+          transformRotateById("hour-hand", hourAngle);
+          transformRotateById("hour-hand-2", hourAngle + 180);
+          transformRotateById("minute-hand", minuteAngle);
+          transformRotateById("minute-hand-2", minuteAngle + 180);
+          transformRotateById("second-hand", secondAngle);
+          transformRotateById("second-hand-2", secondAngle + 180);
 
-      // 12 o'clock position
-      for (let i = 0; i < 2; i++) {
-        let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        setSvgLineAttributes(line, 100 + (i == 0 ? -2 : 2), 4.75, 100 + (i == 0 ? -2 : 2), 18, "hour-marker", 2);
-        markers.appendChild(line);
-      }
+          const monthStr = months[month].substring(0, 3).toUpperCase();
+          const weekdayStr = days[weekday].substring(0, 3).toUpperCase();
 
-      // 1 to 11 o'clock positions
-      for (let i = 1; i < 12; i++) {
-        let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        setSvgLineAttributes(line, 100, 12, 100, 18, "hour-marker", 2, i * 30);
-        markers.appendChild(line);
-      }
-
-      // 1 to 11 o'clock numbers
-      for (let i = 1; i < 12; i++) {
-        let text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        text.setAttribute("x", "100");
-        text.setAttribute("y", "7");
-        text.setAttribute("class", "face-seconds");
-        text.setAttribute("text-anchor", "middle");
-        text.setAttribute("dominant-baseline", "middle");
-        text.textContent = i * 5;        
-        text.setAttribute("transform", `rotate(${i * 30} 100 100)`);
-        markers.appendChild(text);
-      }
-
-      // 5 minute markers
-      for (let i = 0; i < 60; i++) {
-        if (i % 5 !== 0) {
-          let line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-          setSvgLineAttributes(line, 100, 5, 100, 10, "minute-marker", 1, i * 6);
-          markers.appendChild(line);
+          setContentById("dow-str", weekdayStr);
+          setContentById("day-str", day);
+          setContentById("mth-str", monthStr);
         }
       }
-    }
 
-    // ----- -----
-    async function loadSound(url) {
-      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-      const res = await fetch(url); // same-origin fetch is fine
-      if (!res.ok) {
-        __(`loadSound error: HTTP ${res.status}`, 0);
-        return null;
+      // ----- Transform rotate by Id -----
+      function transformRotateById(id, angle) {
+        const el = document.getElementById(id);
+        if (el) {
+          el.setAttribute("transform", `rotate(${angle} 100 100)`);
+        }
       }
 
-      const arrayBuf = await res.arrayBuffer();
-
-      let decoded;
-      try {
-        decoded = await audioCtx.decodeAudioData(arrayBuf);
-      } catch {
-        decoded = await new Promise((resolve, reject) =>
-          audioCtx.decodeAudioData(arrayBuf, resolve, reject)
-        );
+      // ----- -----
+      function setAttributeById(id, attribute, value) {
+        const el = document.getElementById(id);
+        if (el) {
+          el.setAttribute(attribute, value);
+        }
       }
-      if (!(decoded instanceof AudioBuffer)) {
-        __('loadSound error: Decoded result is not an AudioBuffer', 0);
-        return null;
-      }
-      return decoded;
-    }
 
-    // ----- -----
-    function playSound(buffer) {
-      if (!(buffer instanceof AudioBuffer) || !audioCtx) return false;
-      try {
-        const src = audioCtx.createBufferSource();
-        src.buffer = buffer;                 // must be an AudioBuffer
-        src.connect(audioCtx.destination);
-        src.start();                          // start immediately
-        return src;
-      } catch(err) {
-        __('Cannot play sound', 1);
+      // ----- ----
+      function getAttributeById(id, attr) {
+        const el = document.getElementById(id);
+        if (el) {
+          return el.getAttribute(attr);
+        }
         return false;
       }
-    }
 
-    /* ============ Core / Main code ============ */
-
-    /**
-     * This get's run on first load
-     */
-    document.addEventListener("DOMContentLoaded", function() {
-
-      const params = new URLSearchParams(window.location.search);
-      const debugValue = params.get("debug");
-      if (debugValue !== null) {
-        isDebug = isTrue(debugValue, true);
-      }
-      if (isDebug) __('*** DEBUG ON ***');
-
-      performInit();
-
-      const analogValue = params.get("analog");
-      if (analogValue !== null) {
-        isAnalogOn = isTrue(analogValue, true);
-      }
-      if (isAnalogOn) activateAnalog(true); // start the clock works, incl. saving state in localStorage
- 
-      drawAnalogClockFace();
-
-      updateAll(); // Initialize clock immediately, first time run
-
-      if ("wakeLock" in navigator) {
-        wakeLockSupported = true;
-        handleVisibilityChange(null); // first time run, fake it
-      } else {
-        __("Screen Wake Lock API is not supported on this browser", 1);
+      // ----- Set visibility by Id, html visibility attribute -----
+      function setVisibilityById(id, visible = true) {
+        let value = visible ? "visible" : "hidden";
+        setAttributeById(id, "visibility", value);
       }
 
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-      window.addEventListener('resize', handleVisibilityChange);
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('keydown', handleKeyEvent);
-      document.addEventListener('keyup', handleKeyEvent);
-      document.body.addEventListener('dblclick', handleDoubleClick);
+      // ----- Toggle class names -----
+      function toggleClassById(id, first, class1, class2) {
+        let el = document.getElementById(id);
+        if (el) {
+          if (first) {
+            el.classList.remove(class2);
+            el.classList.add(class1);
+          } else {
+            el.classList.remove(class1);
+            el.classList.add(class2);
+          }
+        }
+      }
 
-      document.getElementById('pomodoro-checkbox').addEventListener('change', handlePomodoroSwitchChange);
-      document.getElementById('analog-checkbox').addEventListener('change', handleAnalogChange);
-      document.getElementById('sound-checkbox').addEventListener('change', handleSoundChange);
-      document.getElementById('face-name-input').addEventListener('input', handelFaceNameChange);
-      document.getElementById('work-for-input').addEventListener('input', handlePomodoroValueChange);
-      document.getElementById('rest-for-input').addEventListener('input', handlePomodoroValueChange);
+      // ----- Set visibility by Id, with .show and .hide classes -----
+      function setShowClassById(id, visible = true) {
+        toggleClassById(id, visible, "show", "hide");
+      }
 
-      document.addEventListener('keydown', handleKeyPress);
+      // ----- -----
+      function toggleClassByClass(classN, first, class1, class2) {
+        const nodes = document.querySelectorAll(`.${classN}`);
+        nodes.forEach((el) => {
+          if (first) {
+            el.classList.remove(class2);
+            el.classList.add(class1);
+          } else {
+            el.classList.remove(class1);
+            el.classList.add(class2);
+          }
+        });
+      }
 
-      // START THE CLOCK!!
-      clockInterval = setInterval(updateAll, CLOCK_REFRESH); // Start the update loop
-    });
-  </script>
-</body>
+      // ----- -----
+      function setShowClassByClass(classN, visible = true) {
+        toggleClassByClass(classN, visible, "show", "hide");
+      }
+
+      // ----- Set X and Width by Id (does not set Y and Height) -----
+      function setXAndWidthById(id, x, width) {
+        const element = document.getElementById(id);
+        if (element) {
+          let newX = x.toFixed(3);
+          let newWidth = width.toFixed(3);
+
+          setVisibilityById(id, true); // assume you want to see it
+          if (element.getAttribute("x") !== newX) {
+            element.setAttribute("x", newX);
+          }
+          if (element.getAttribute("width") !== newWidth) {
+            element.setAttribute("width", newWidth);
+          }
+        }
+      }
+
+      // ----- Draw pomodoro segments -----
+      function setRingSegmentPathById(id, startAngle, endAngle) {
+        // Convert angles from degrees to radians
+        const startRad = ((startAngle - 90) * Math.PI) / 180; // -90 to start at 12 o'clock
+        const endRad = ((endAngle - 90) * Math.PI) / 180;
+
+        const radius = 78;
+
+        // Calculate start and end points
+        const startX = (100 + radius * Math.cos(startRad)).toFixed(3);
+        const startY = (100 + radius * Math.sin(startRad)).toFixed(3);
+        const endX = (100 + radius * Math.cos(endRad)).toFixed(3);
+        const endY = (100 + radius * Math.sin(endRad)).toFixed(3);
+
+        // Determine if we need the large arc flag
+        const diff =
+          endAngle < startAngle ? startAngle - endAngle : endAngle - startAngle;
+        const largeArcFlag = diff > 180 ? "1" : "0";
+
+        // Create the SVG path with both large arc and sweep flags
+        const pathData =
+          `M ${startX} ${startY} ` +
+          `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY}`;
+
+        // Update the path element
+
+        setVisibilityById(id, true);
+        document.getElementById(id).setAttribute("d", pathData);
+      }
+
+      // ----- Update Pomodoro progress -----
+      function updatePomodoro(now) {
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+        const maxVal = (pmdrWorkFor + pmdrRestFor) * 60;
+        const splitAt = pmdrWorkFor / (pmdrWorkFor + pmdrRestFor);
+
+        var progress = minutes * 60 + seconds;
+        while (progress > maxVal) progress -= maxVal;
+        const percentage = progress / maxVal;
+
+        if (isSoundOn) {
+          if (Math.round(percentage * 1000) === Math.round(splitAt * 1000)) {
+            playSound(toneStart);
+          }
+          if (percentage == 1) {
+            playSound(toneEnd);
+          }
+        }
+
+        if (!isAnalogOn) {
+          // Digital
+          const knownSvgWidth = 300;
+
+          if (percentage <= splitAt) {
+            let cut = percentage;
+            setXAndWidthById("pd1", 0, cut * knownSvgWidth);
+            setXAndWidthById(
+              "pd2",
+              cut * knownSvgWidth,
+              (splitAt - cut) * knownSvgWidth,
+            );
+            setVisibilityById("pd3", false);
+            setVisibilityById("pd4", false);
+            setXAndWidthById(
+              "pd5",
+              splitAt * knownSvgWidth,
+              (1 - splitAt) * knownSvgWidth,
+            );
+          } else {
+            let cut = percentage - splitAt;
+            setVisibilityById("pd1", false);
+            setVisibilityById("pd2", false);
+            setXAndWidthById(
+              "pd3",
+              splitAt * knownSvgWidth,
+              cut * knownSvgWidth,
+            );
+            setXAndWidthById(
+              "pd4",
+              (splitAt + cut) * knownSvgWidth,
+              (1 - splitAt + cut) * knownSvgWidth,
+            );
+            setXAndWidthById("pd5", 0, splitAt * knownSvgWidth);
+          }
+        } else {
+          // Analog
+          const multiplier = 2;
+
+          if (percentage <= splitAt) {
+            setRingSegmentPathById("pa1", 0, percentage * 360);
+            setRingSegmentPathById("pa2", percentage * 360, splitAt * 360);
+            setVisibilityById("pa3", false);
+            setVisibilityById("pa4", false);
+            setRingSegmentPathById("pa5", splitAt * 360, 360);
+          } else {
+            setVisibilityById("pa1", false);
+            setVisibilityById("pa2", false);
+            setRingSegmentPathById("pa3", splitAt * 360, percentage * 360);
+            setRingSegmentPathById("pa4", percentage * 360, 360);
+            setRingSegmentPathById("pa5", 0, splitAt * 360);
+          }
+        }
+      }
+
+      // ----- Update Title of the page (tab in browser) -----
+      function updateTitle(now) {
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const title =
+          String(hours).padStart(2, "0") +
+          ":" +
+          String(minutes).padStart(2, "0");
+        if (title !== document.title) document.title = title;
+      }
+
+      // ----- Update the favicon -----
+      function updateFavicon(now) {
+        if (now) {
+          const hours = now.getHours() % 12;
+          const minutes = now.getMinutes();
+          if (minutes == lastFaviconMins && hours == lastFaviconHour) return; // do nothing
+          if (hours != lastFaviconHour) lastFaviconHour = hours;
+          lastFaviconMins = minutes;
+
+          const svg =
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" stroke-linecap="round" stroke="#876" stroke-width="7.25">' +
+            '<circle cx="50" cy="50" r="36.5" fill="none"/>' +
+            `<line x1="50" y1="50" x2="${50 + 17.5 * Math.sin((2 * Math.PI * hours) / 12)}" y2="${50 - 17.5 * Math.cos((2 * Math.PI * hours) / 12)}"/>` +
+            `<line x1="50" y1="50" x2="${50 + 22.5 * Math.sin((2 * Math.PI * minutes) / 60)}" y2="${50 - 22.5 * Math.cos((2 * Math.PI * minutes) / 60)}"/>` +
+            "</svg>";
+          const encoded = "data:image/svg+xml;base64," + btoa(svg);
+          document.getElementById("favicon").href = encoded;
+        } else if (lastFaviconMins != -1) {
+          document.getElementById("favicon").href = "favicon.svg";
+          lastFaviconMins = -1;
+        }
+      }
+
+      // ----- Update all handlers -----
+      function updateAll() {
+        if (isVisible) {
+          const now = new Date();
+          updateClock(now);
+          updateTitle(now);
+          updateFavicon(now);
+          if (isPomodoroOn) updatePomodoro(now);
+        } else {
+          if (oGTitle !== document.title) {
+            document.title = oGTitle;
+            updateFavicon(false);
+          }
+        }
+      }
+
+      // ----- Visibility change handler -----
+      async function handleVisibilityChange(event) {
+        if (document.visibilityState === "hidden") {
+          isVisible = false;
+        } else if (document.visibilityState === "visible") {
+          isVisible = true;
+        } else {
+          isVisible = true; // what's your fallback choice?
+        }
+
+        if (wakeLockSupported) {
+          if (isVisible) {
+            if (wakeLock === null) {
+              try {
+                wakeLock = await navigator.wakeLock.request("screen");
+                wakeLock.addEventListener("release", () => {
+                  wakeLock = null;
+                });
+              } catch (err) {
+                __(`Wake Lock Error: ${err.name}, ${err.message}`, 0);
+              }
+            }
+          } else {
+            // !isVisible
+            if (wakeLock !== null) {
+              wakeLock.release().then(() => {
+                wakeLock = null;
+              });
+            }
+          }
+        }
+
+        updateAll();
+      }
+
+      // ----- Footer bar visibility handler -----
+      function handleFooterVisibility(event) {
+        if (isFooterVisible) {
+          toggleClassById("footer", false, "show", "hide");
+          document.body.style.cursor = "none";
+          isFooterVisible = false;
+        } else if (isMouseMoving) {
+          toggleClassById("footer", true, "show", "hide");
+          document.body.style.cursor = "default";
+          isFooterVisible = true;
+        }
+        clearTimeout(footerTimeout);
+        footerTimeout = null; // must reset to pass `=== null` test
+      }
+
+      // ----- Debounce handler -----
+      function handleDebounce(event) {
+        if (null !== debounceTimeout) clearTimeout(debounceTimeout);
+        debounceTimeout = null;
+        isMouseMoving = false;
+        if (isFooterVisible) {
+          if (null !== footerTimeout) clearTimeout(footerTimeout); // reset
+          footerTimeout = setTimeout(
+            handleFooterVisibility,
+            FOOTER_HIDE_DURATION,
+          );
+        }
+      }
+
+      // ----- Mouse move handler -----
+      function handleMouseMove(event) {
+        let eventX = null === event ? null : event.clientX;
+        let eventY = null === event ? null : event.clientY;
+        if (
+          lastMousePosition.x === null ||
+          lastMousePosition.y === null ||
+          lastMousePosition.x !== eventX ||
+          lastMousePosition.y !== eventY
+        ) {
+          isMouseMoving = true;
+          clearTimeout(debounceTimeout);
+          debounceTimeout = setTimeout(handleDebounce, DEBOUNCE_POLL_RATE);
+          lastMousePosition.x = eventX;
+          lastMousePosition.y = eventY;
+          if (!isFooterVisible && footerTimeout === null) {
+            footerTimeout = setTimeout(
+              handleFooterVisibility,
+              FOOTER_SHOW_DURATION,
+            );
+          }
+        }
+      }
+
+      // ----- Key event handler -----
+      function handleKeyEvent(event) {
+        handleMouseMove(null);
+      }
+
+      // ----- Double click handler -----
+      function handleDoubleClick(event) {
+        if (event.target.closest("footer") !== null) return;
+        if (!document.fullscreenElement) {
+          let element = document.documentElement;
+          if (element.requestFullscreen) {
+            element.requestFullscreen();
+          } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+          } else {
+            __("Fullscreen API not supported", 0);
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        }
+      }
+
+      // ----- Handle Pomodoro activation -----
+      function handlePomodoroSwitchChange(event) {
+        if (isPomodoroOn) {
+          safeSetItem("isPomodoroOn", isPomodoroOn);
+        } else {
+          localStorage.removeItem("isPomodoroOn");
+        }
+        if (isPomodoroOn) {
+          let now = new Date();
+          updatePomodoro(now);
+        } else {
+          for (let i = 1; i <= 5; i++) {
+            setVisibilityById("pd" + i, false);
+            setVisibilityById("pa" + i, false);
+          }
+        }
+        setShowClassByClass("sound-span", isPomodoroOn);
+      }
+
+      // ----- -----
+      function getValueById(id) {
+        const el = document.getElementById(id);
+        if (el) {
+          return el.value;
+        } else return false;
+      }
+
+      // ----- -----
+      function handlePomodoroValueChange(event) {
+        const wantedWork = parseInt(getValueById("work-for-input"));
+        const wantedRest = parseInt(getValueById("rest-for-input"));
+
+        if (
+          wantedWork <= 0 ||
+          wantedWork > 120 ||
+          wantedRest <= 0 ||
+          wantedRest > 120
+        )
+          return;
+
+        const savedWork = safeGetItem("pomodoroWorkFor", false);
+        const savedRest = safeGetItem("pomodoroRestFor", false);
+
+        if (savedWork != wantedWork || savedRest != wantedRest) {
+          if (wantedWork && savedWork != wantedWork) {
+            safeSetItem("pomodoroWorkFor", wantedWork);
+            pmdrWorkFor = Number(wantedWork);
+          }
+          if (wantedRest && savedRest != wantedRest) {
+            safeSetItem("pomodoroRestFor", wantedRest);
+            pmdrRestFor = Number(wantedRest);
+          }
+          let now = new Date();
+          updatePomodoro(now);
+        }
+      }
+
+      // ----- -----
+      function handleAnalogChange(event) {
+        activateAnalog(isAnalogOn);
+      }
+
+      // ----- -----
+      async function handleSoundChange(event) {
+        const el = document.getElementById("sound-checkbox");
+        if (el) {
+          try {
+            if (el.checked) {
+              // user gesture: safe to create/resume and load sounds
+              audioCtx =
+                audioCtx ||
+                new (window.AudioContext || window.webkitAudioContext)();
+              if (audioCtx.state === "suspended") await audioCtx.resume();
+              if (!(toneStart instanceof AudioBuffer))
+                toneStart = await loadSound("tone_start.mp3");
+              if (!(toneEnd instanceof AudioBuffer))
+                toneEnd = await loadSound("tone_end.mp3");
+              playSound(toneStart);
+            } else {
+              // turn sound off
+              if (audioCtx && audioCtx.state !== "closed")
+                await audioCtx.suspend();
+            }
+          } catch (err) {
+            __(`Sound toggle failed: ${err.name} ${err.message}`, 0);
+          }
+        }
+      }
+
+      // ----- -----
+      function handelFaceNameChange(event) {
+        const el = document.getElementById("face-name-input");
+        if (el) {
+          const faceName = el.value;
+          document.getElementById("face-name").textContent = faceName;
+          if (faceName === "") {
+            localStorage.removeItem("faceName");
+          } else {
+            safeSetItem("faceName", faceName);
+          }
+
+          // fake keep alive
+          handleDebounce();
+          handleMouseMove(null);
+        }
+      }
+
+      // ----- -----
+      function isTypingInInput(event) {
+        const target = event.target;
+        return (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable
+        );
+      }
+
+      // ----- -----
+      function handleKeyPress(event) {
+        if (!event) return;
+        const eventKey = event.key.toLowerCase();
+        const isNotTII = !isTypingInInput(event);
+
+        if (eventKey === "p" && isNotTII) {
+          const el = document.getElementById("pomodoro-checkbox");
+          if (el) {
+            el.checked = !el.checked;
+          }
+          handlePomodoroSwitchChange(event);
+        }
+
+        if ((eventKey === "a" || eventKey === "d") && isNotTII) {
+          const el = document.getElementById("analog-checkbox");
+          if (el) {
+            el.checked = !el.checked;
+          }
+          handleAnalogChange(event);
+        }
+
+        // Browser only allows sound if the interaction is a mouse ?? // TODO : fact check?
+        if (isPomodoroOn && eventKey === "s" && isNotTII) {
+          const el = document.getElementById("sound-checkbox");
+          if (el) {
+            el.checked = !el.checked;
+          }
+          handleSoundChange(event);
+        }
+      }
+
+      // ----- -----
+      function safeSetItem(key, value) {
+        try {
+          localStorage.setItem(key, value);
+        } catch (err) {
+          __(`localStorage.setItem: ${err.name}, ${err.message}`, 0);
+        }
+      }
+
+      // ----- -----
+      function safeGetItem(key, fallback = false) {
+        var ret;
+        try {
+          ret = localStorage.getItem(key);
+        } catch (err) {
+          __(`localStorage.setItem: ${err.name}, ${err.message}`, 0);
+          return fallback;
+        }
+        if (null === ret) return fallback; // not there, fallback
+        return ret;
+      }
+
+      // ----- -----
+      function processConfig(config) {
+        if (typeof config !== "object") return;
+
+        const faceName = config["faceName"];
+        if (faceName) {
+          document.getElementById("face-name").textContent = faceName;
+          document.getElementById("face-name-input").value = faceName;
+        }
+
+        const wantsAnalogOn = isTrue(config["isAnalogOn"], false);
+        if (wantsAnalogOn) isAnalogOn = true;
+
+        const wantsPomodoroOn = isTrue(config["isPomodoroOn"], false);
+        isPomodoroOn = wantsPomodoroOn;
+        setShowClassByClass("sound-span", wantsPomodoroOn);
+
+        const pomodoroWorkFor = Number(config["pomodoroWorkFor"]);
+        if (!Number.isNaN(pomodoroWorkFor)) pmdrWorkFor = pomodoroWorkFor;
+        const pomodoroRestFor = Number(config["pomodoroRestFor"]);
+        if (!Number.isNaN(pomodoroRestFor)) pmdrRestFor = pomodoroRestFor;
+
+        setAttributeById("work-for-input", "value", pmdrWorkFor);
+        setAttributeById("rest-for-input", "value", pmdrRestFor);
+      }
+
+      // ----- Initialisation code -----
+      async function performInit() {
+        let config = {};
+        config["ping"] = Date.now(); // need this otherwise an empty localStorage causes issues
+        try {
+          if (localStorage) {
+            for (let i = 0; i < localStorage.length; i++) {
+              let key = localStorage.key(i);
+              config[key] = localStorage.getItem(key);
+            }
+          }
+        } catch (err) {
+          __(err, 0);
+        }
+
+        const isInitialised = safeGetItem("clockInitialised", false);
+        if (false == isInitialised) {
+          __("Loading config from file");
+          fetch("config.json")
+            .then((response) => {
+              return response.json();
+            })
+            .then((settings) => {
+              // Store each root level setting in localStorage
+              Object.keys(settings).forEach((key) => {
+                safeSetItem(key, settings[key]);
+                config[key] = settings[key];
+              });
+              processConfig(config);
+              safeSetItem("clockInitialised", true);
+            })
+            .catch((err) => {
+              __(`Error loading settings: ${err.name} ${err.message}`, 0);
+              safeSetItem("clockInitialised", true);
+              return error;
+            });
+        } else {
+          processConfig(config);
+        }
+        return Promise.resolve();
+      }
+
+      // ----- Swap modes function, digital<->analog -----
+      function activateAnalog(active) {
+        if (active) {
+          document.body.classList.remove("digital");
+          document.body.classList.add("analog");
+          setShowClassById("digital-clock", false);
+          setShowClassById("analog-clock", true);
+          safeSetItem("isAnalogOn", true);
+          setShowClassByClass("analog-span", true);
+          isAnalogOn = true;
+        } else {
+          document.body.classList.remove("analog");
+          document.body.classList.add("digital");
+          setShowClassById("analog-clock", false);
+          setShowClassById("digital-clock", true);
+          localStorage.removeItem("isAnalogOn");
+          setShowClassByClass("analog-span", false);
+          isAnalogOn = false;
+        }
+        updateAll();
+      }
+
+      // ----- -----
+      function setSvgLineAttributes(
+        line,
+        x1,
+        y1,
+        x2,
+        y2,
+        className,
+        strokeWidth,
+        rotate = 0,
+      ) {
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("class", className);
+        line.setAttribute("stroke-width", strokeWidth);
+        if (rotate !== 0) {
+          line.setAttribute("transform", `rotate(${rotate} 100 100)`);
+        }
+      }
+
+      // ----- -----
+      function drawAnalogClockFace() {
+        const svg = document.getElementById("analog-clock");
+        const markers = document.getElementById("markers");
+
+        // 12 o'clock position
+        for (let i = 0; i < 2; i++) {
+          let line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line",
+          );
+          setSvgLineAttributes(
+            line,
+            100 + (i == 0 ? -2 : 2),
+            4.75,
+            100 + (i == 0 ? -2 : 2),
+            18,
+            "hour-marker",
+            2,
+          );
+          markers.appendChild(line);
+        }
+
+        // 1 to 11 o'clock positions
+        for (let i = 1; i < 12; i++) {
+          let line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line",
+          );
+          setSvgLineAttributes(
+            line,
+            100,
+            12,
+            100,
+            18,
+            "hour-marker",
+            2,
+            i * 30,
+          );
+          markers.appendChild(line);
+        }
+
+        // 1 to 11 o'clock numbers
+        for (let i = 1; i < 12; i++) {
+          let text = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "text",
+          );
+          text.setAttribute("x", "100");
+          text.setAttribute("y", "7");
+          text.setAttribute("class", "face-seconds");
+          text.setAttribute("text-anchor", "middle");
+          text.setAttribute("dominant-baseline", "middle");
+          text.textContent = i * 5;
+          text.setAttribute("transform", `rotate(${i * 30} 100 100)`);
+          markers.appendChild(text);
+        }
+
+        // 5 minute markers
+        for (let i = 0; i < 60; i++) {
+          if (i % 5 !== 0) {
+            let line = document.createElementNS(
+              "http://www.w3.org/2000/svg",
+              "line",
+            );
+            setSvgLineAttributes(
+              line,
+              100,
+              5,
+              100,
+              10,
+              "minute-marker",
+              1,
+              i * 6,
+            );
+            markers.appendChild(line);
+          }
+        }
+      }
+
+      // ----- -----
+      async function loadSound(url) {
+        audioCtx =
+          audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        const res = await fetch(url); // same-origin fetch is fine
+        if (!res.ok) {
+          __(`loadSound error: HTTP ${res.status}`, 0);
+          return null;
+        }
+
+        const arrayBuf = await res.arrayBuffer();
+
+        let decoded;
+        try {
+          decoded = await audioCtx.decodeAudioData(arrayBuf);
+        } catch {
+          decoded = await new Promise((resolve, reject) =>
+            audioCtx.decodeAudioData(arrayBuf, resolve, reject),
+          );
+        }
+        if (!(decoded instanceof AudioBuffer)) {
+          __("loadSound error: Decoded result is not an AudioBuffer", 0);
+          return null;
+        }
+        return decoded;
+      }
+
+      // ----- -----
+      function playSound(buffer) {
+        if (!(buffer instanceof AudioBuffer) || !audioCtx) return false;
+        try {
+          const src = audioCtx.createBufferSource();
+          src.buffer = buffer; // must be an AudioBuffer
+          src.connect(audioCtx.destination);
+          src.start(); // start immediately
+          return src;
+        } catch (err) {
+          __("Cannot play sound", 1);
+          return false;
+        }
+      }
+
+      /* ============ Core / Main code ============ */
+
+      /**
+       * This get's run on first load
+       */
+      document.addEventListener("DOMContentLoaded", function () {
+        const params = new URLSearchParams(window.location.search);
+        const debugValue = params.get("debug");
+        if (debugValue !== null) {
+          isDebug = isTrue(debugValue, true);
+        }
+        if (isDebug) __("*** DEBUG ON ***");
+
+        performInit();
+
+        const analogValue = params.get("analog");
+        if (analogValue !== null) {
+          isAnalogOn = isTrue(analogValue, true);
+        }
+        if (isAnalogOn) activateAnalog(true); // start the clock works, incl. saving state in localStorage
+
+        drawAnalogClockFace();
+
+        updateAll(); // Initialize clock immediately, first time run
+
+        if ("wakeLock" in navigator) {
+          wakeLockSupported = true;
+          const acquireWakeLock = async () => {
+            if (wakeLock === null) {
+              try {
+                wakeLock = await navigator.wakeLock.request("screen");
+                wakeLock.addEventListener("release", () => {
+                  wakeLock = null;
+                });
+              } catch (err) {
+                __(`Wake Lock Error: ${err.name}, ${err.message}`, 0);
+              }
+            }
+          };
+          document.addEventListener("click", acquireWakeLock, { once: true });
+          document.addEventListener("keydown", acquireWakeLock, { once: true });
+          document.addEventListener("touchstart", acquireWakeLock, {
+            once: true,
+          });
+        } else {
+          __("Screen Wake Lock API is not supported on this browser", 1);
+        }
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+        window.addEventListener("resize", handleVisibilityChange);
+        document.addEventListener("mousemove", handleMouseMove);
+        document.addEventListener("touchstart", handleMouseMove);
+        document.addEventListener("keydown", handleKeyEvent);
+        document.addEventListener("keyup", handleKeyEvent);
+        document.body.addEventListener("dblclick", handleDoubleClick);
+
+        document
+          .getElementById("pomodoro-checkbox")
+          .addEventListener("change", handlePomodoroSwitchChange);
+        document
+          .getElementById("analog-checkbox")
+          .addEventListener("change", handleAnalogChange);
+        document
+          .getElementById("sound-checkbox")
+          .addEventListener("change", handleSoundChange);
+        document
+          .getElementById("face-name-input")
+          .addEventListener("input", handelFaceNameChange);
+        document
+          .getElementById("work-for-input")
+          .addEventListener("input", handlePomodoroValueChange);
+        document
+          .getElementById("rest-for-input")
+          .addEventListener("input", handlePomodoroValueChange);
+
+        document.addEventListener("keydown", handleKeyPress);
+
+        // START THE CLOCK!!
+        clockInterval = setInterval(updateAll, CLOCK_REFRESH); // Start the update loop
+      });
+    </script>
+  </body>
 </html>
