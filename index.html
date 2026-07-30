@@ -26,6 +26,12 @@
     <link rel="icon" type="image/svg+xml" id="favicon" />
     <link rel="manifest" href="site.webmanifest" />
 
+    <!-- iOS Safari has no Fullscreen API for arbitrary elements; this lets
+         "Add to Home Screen" launch chrome-less instead, as a fallback. -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -196,6 +202,10 @@
         display: block;
       }
 
+      #fullscreen-btn {
+        cursor: pointer;
+      }
+
       input[type="text"],
       input[type="number"] {
         background-color: transparent;
@@ -239,6 +249,32 @@
 
       .hide {
         display: none;
+      }
+
+      #toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: 85%;
+        padding: 10px 16px;
+        border-radius: 6px;
+        background: rgba(20, 20, 20, 0.9);
+        color: #eee;
+        font-size: 0.85rem;
+        text-align: center;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.3s ease,
+          visibility 0.3s ease;
+        z-index: 100;
+        pointer-events: none;
+      }
+
+      #toast.show {
+        opacity: 1;
+        visibility: visible;
       }
     </style>
   </head>
@@ -618,7 +654,17 @@
           id="face-name-input"
           placeholder="Face Name"
       /></span>
+      |
+      <span
+        id="fullscreen-btn"
+        title="Toggle fullscreen"
+        role="button"
+        tabindex="0"
+        >&#x1F5BC;</span
+      >
     </footer>
+
+    <div id="toast"></div>
 
     <script>
       const months = new Array(
@@ -1145,14 +1191,39 @@
       // ----- Double click handler -----
       function handleDoubleClick(event) {
         if (event.target.closest("footer") !== null) return;
+        toggleFullscreen();
+      }
+
+      // ----- Fullscreen button handlers -----
+      function handleFullscreenButtonClick(event) {
+        event.stopPropagation();
+        toggleFullscreen();
+      }
+
+      function handleFullscreenButtonKeydown(event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleFullscreen();
+        }
+      }
+
+      // ----- Enter/exit fullscreen -----
+      function toggleFullscreen() {
         if (!document.fullscreenElement) {
           let element = document.documentElement;
           if (element.requestFullscreen) {
-            element.requestFullscreen();
+            // iOS/iPadOS Safari expose requestFullscreen() but never grant it
+            // for non-<video> elements: the promise rejects (or just never
+            // resolves) with no visible effect, so verify it actually landed.
+            Promise.resolve(element.requestFullscreen()).catch(() => {});
+            setTimeout(() => {
+              if (!document.fullscreenElement) showFullscreenHint();
+            }, 300);
           } else if (element.webkitRequestFullscreen) {
             element.webkitRequestFullscreen();
           } else {
-            __("Fullscreen API not supported", 0);
+            showFullscreenHint();
           }
         } else {
           if (document.exitFullscreen) {
@@ -1161,6 +1232,38 @@
             document.webkitExitFullscreen();
           }
         }
+      }
+
+      // ----- Fullscreen fallback messaging -----
+      function showFullscreenHint() {
+        const isStandalone =
+          navigator.standalone === true ||
+          window.matchMedia("(display-mode: standalone)").matches;
+        if (isStandalone) return; // already chrome-less, nothing to suggest
+
+        const isIOS =
+          /iP(ad|hone|od)/.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+        if (isIOS) {
+          showToast(
+            'Safari doesn’t support fullscreen here. Tap Share → "Add to Home Screen" for a fullscreen experience.',
+          );
+        } else {
+          __("Fullscreen API not supported", 0);
+        }
+      }
+
+      let toastTimeout = null;
+      function showToast(msg, duration = 5000) {
+        const toast = document.getElementById("toast");
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.classList.add("show");
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove("show");
+        }, duration);
       }
 
       // ----- Handle Pomodoro activation -----
@@ -1642,6 +1745,12 @@
         document
           .getElementById("rest-for-input")
           .addEventListener("input", handlePomodoroValueChange);
+        document
+          .getElementById("fullscreen-btn")
+          .addEventListener("click", handleFullscreenButtonClick);
+        document
+          .getElementById("fullscreen-btn")
+          .addEventListener("keydown", handleFullscreenButtonKeydown);
 
         document.addEventListener("keydown", handleKeyPress);
 
