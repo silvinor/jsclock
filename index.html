@@ -26,8 +26,9 @@
     <link rel="icon" type="image/svg+xml" id="favicon" />
     <link rel="manifest" href="site.webmanifest" />
 
-    <!-- iOS Safari has no Fullscreen API for arbitrary elements; this lets
-         "Add to Home Screen" launch chrome-less instead, as a fallback. -->
+    <!-- Chrome on iOS/iPadOS has no working Fullscreen API for arbitrary
+         elements (Safari's works fine); this lets "Add to Home Screen"
+         launch chrome-less instead, as a fallback. -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -204,6 +205,7 @@
 
       #fullscreen-btn {
         cursor: pointer;
+        opacity: 0.667;
       }
 
       input[type="text"],
@@ -249,32 +251,6 @@
 
       .hide {
         display: none;
-      }
-
-      #toast {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        max-width: 85%;
-        padding: 10px 16px;
-        border-radius: 6px;
-        background: rgba(20, 20, 20, 0.9);
-        color: #eee;
-        font-size: 0.85rem;
-        text-align: center;
-        opacity: 0;
-        visibility: hidden;
-        transition:
-          opacity 0.3s ease,
-          visibility 0.3s ease;
-        z-index: 100;
-        pointer-events: none;
-      }
-
-      #toast.show {
-        opacity: 1;
-        visibility: visible;
       }
     </style>
   </head>
@@ -663,8 +639,6 @@
         >&#x1F5BC;</span
       >
     </footer>
-
-    <div id="toast"></div>
 
     <script>
       const months = new Array(
@@ -1213,17 +1187,24 @@
         if (!document.fullscreenElement) {
           let element = document.documentElement;
           if (element.requestFullscreen) {
-            // iOS/iPadOS Safari expose requestFullscreen() but never grant it
-            // for non-<video> elements: the promise rejects (or just never
-            // resolves) with no visible effect, so verify it actually landed.
-            Promise.resolve(element.requestFullscreen()).catch(() => {});
+            // Chrome on iOS/iPadOS exposes requestFullscreen() but never
+            // grants it for non-<video> elements (Safari itself supports
+            // it fine): the promise rejects, or just never resolves, with
+            // no visible effect — so verify it actually landed.
+            let alerted = false;
+            const alertOnce = () => {
+              if (alerted) return;
+              alerted = true;
+              alert("Fullscreen isn't supported in this browser.");
+            };
+            element.requestFullscreen().catch(alertOnce);
             setTimeout(() => {
-              if (!document.fullscreenElement) showFullscreenHint();
+              if (!document.fullscreenElement) alertOnce();
             }, 300);
           } else if (element.webkitRequestFullscreen) {
             element.webkitRequestFullscreen();
           } else {
-            showFullscreenHint();
+            __("Fullscreen API not supported", 0);
           }
         } else {
           if (document.exitFullscreen) {
@@ -1232,38 +1213,6 @@
             document.webkitExitFullscreen();
           }
         }
-      }
-
-      // ----- Fullscreen fallback messaging -----
-      function showFullscreenHint() {
-        const isStandalone =
-          navigator.standalone === true ||
-          window.matchMedia("(display-mode: standalone)").matches;
-        if (isStandalone) return; // already chrome-less, nothing to suggest
-
-        const isIOS =
-          /iP(ad|hone|od)/.test(navigator.userAgent) ||
-          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-        if (isIOS) {
-          showToast(
-            'Safari doesn’t support fullscreen here. Tap Share → "Add to Home Screen" for a fullscreen experience.',
-          );
-        } else {
-          __("Fullscreen API not supported", 0);
-        }
-      }
-
-      let toastTimeout = null;
-      function showToast(msg, duration = 5000) {
-        const toast = document.getElementById("toast");
-        if (!toast) return;
-        toast.textContent = msg;
-        toast.classList.add("show");
-        clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => {
-          toast.classList.remove("show");
-        }, duration);
       }
 
       // ----- Handle Pomodoro activation -----
